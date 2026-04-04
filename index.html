@@ -690,7 +690,7 @@ async function doRoll() {
       renderStations();
       if(cr.winner!==undefined){
         const ws=document.getElementById('station-'+cr.winner);
-        if(ws){blinkStation(ws,'blink-green');floatNumber(ws,'👨‍🍳 WON','#10B981');}
+        if(ws) blinkStation(ws,'blink-green');
       }
       if(cr.loser!==undefined){
         const ls=document.getElementById('station-'+cr.loser);
