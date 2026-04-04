@@ -73,9 +73,9 @@ body::before {
 .ai-toggle .toggle-thumb { width: 18px; height: 18px; border-radius: 50%; background: white; position: absolute; top: 2px; left: 2px; transition: transform 0.2s; }
 .ai-toggle input:checked + .toggle-track .toggle-thumb { transform: translateX(18px); }
 
-/* Game */
+/* Game Screen */
 #screen-game { justify-content: flex-start; padding: 16px; min-height: 100vh; gap: 12px; }
-.turn-banner { font-size: clamp(1.2rem, 4vw, 1.8rem); font-weight: 700; text-align: center; padding: 10px 24px; border-radius: 16px; background: rgba(0,0,0,0.4); width: 100%; max-width: 800px; position: relative; border: 2px solid rgba(255,255,255,0.1); animation: bannerPop 0.4s ease-out; }
+.turn-banner { font-size: clamp(1.2rem, 4vw, 1.8rem); font-weight: 700; text-align: center; padding: 10px 24px; border-radius: 16px; background: rgba(0,0,0,0.4); width: 100%; max-width: 800px; border: 2px solid rgba(255,255,255,0.1); animation: bannerPop 0.4s ease-out; }
 @keyframes bannerPop { 0% { transform: scale(0.8); opacity: 0; } 50% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
 
 /* Stations */
@@ -97,27 +97,23 @@ body::before {
 .station-count-change { font-size: 0.85rem; font-weight: 700; animation: countChange 1.5s ease-out forwards; position: absolute; right: 10px; top: 40%; pointer-events: none; }
 @keyframes countChange { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-24px); } }
 
-/* Kitchen Area */
+/* Kitchen + Cards */
 .kitchen-area { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 20px; width: 100%; max-width: 800px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; align-items: center; min-height: 260px; position: relative; overflow: hidden; }
 .card-area { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 10px; min-height: 130px; width: 100%; perspective: 800px; }
-
-/* Cards */
 .card-container { width: 80px; height: 110px; perspective: 600px; position: relative; }
 .card-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.5s ease; }
 .card-inner.flipped { transform: rotateY(180deg); }
 .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(0,0,0,0.4); overflow: hidden; }
-.card-back { background: linear-gradient(135deg, #5a3a1a, #7a5a3a); border: 2px dashed rgba(255,255,255,0.2); color: rgba(255,255,255,0.5); font-size: 2rem; font-weight: 700; }
+.card-back { background: linear-gradient(135deg, #5a3a1a, #7a5a3a); border: 2px dashed rgba(255,255,255,0.2); }
 .card-front { transform: rotateY(180deg); padding: 4px; }
 .card-front .card-svg { width: 44px; height: 44px; margin-top: 4px; }
 .card-front .card-label { font-family: 'Fredoka', sans-serif; font-size: 0.55rem; font-weight: 600; margin-top: auto; margin-bottom: 6px; text-align: center; line-height: 1.1; padding: 0 2px; }
-
 .card-ticket .card-front { background: linear-gradient(135deg, #f5e6c8, #e8d5a8); border: 2px dashed #c4a060; color: #5a4020; background-image: repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(0,0,0,0.03) 8px, rgba(0,0,0,0.03) 9px); }
 .card-plate .card-front { background: linear-gradient(135deg, #059669, #10B981); border: 2px solid var(--golden); color: white; }
 .card-dump .card-front { background: linear-gradient(135deg, #7C3AED, #A855F7); border: 2px solid #c084fc; color: white; }
 .card-dump .card-inner.flipped { transform: rotateY(180deg) rotate(-3deg); }
 .card-cookoff .card-front { background: linear-gradient(135deg, #DC2626, #F97316); border: 2px solid #fbbf24; color: white; animation: cookoffGlow 1.5s ease-in-out infinite; }
 @keyframes cookoffGlow { 0%, 100% { box-shadow: 0 0 8px rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 20px rgba(239,68,68,0.8), 0 0 40px rgba(249,115,22,0.3); } }
-
 .card-container.card-fly-up { animation: cardFlyUp 0.6s ease-in forwards; }
 @keyframes cardFlyUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-200px) scale(0.5); opacity: 0; } }
 .card-container.card-fly-right { animation: cardFlyRight 0.6s ease-in forwards; }
@@ -126,17 +122,14 @@ body::before {
 @keyframes cardFlyCenter { 0% { transform: scale(1); } 100% { transform: scale(1.3); filter: brightness(1.5); } }
 .card-container.card-settle { animation: cardSettle 0.4s ease-out forwards; }
 @keyframes cardSettle { 0% { transform: translateY(-10px); opacity: 0.5; } 100% { transform: translateY(0); opacity: 1; } }
-
 .floating-text { position: absolute; font-weight: 700; font-size: 1rem; pointer-events: none; animation: floatTextUp 1.2s ease-out forwards; z-index: 10; }
 @keyframes floatTextUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.2); } }
-
 .roll-summary { text-align: center; padding: 8px; font-size: 1rem; min-height: 30px; color: var(--text-muted); }
 .roll-summary span { margin: 0 6px; font-weight: 600; }
 .roll-summary .s-ticket { color: #b8a070; }
 .roll-summary .s-dump { color: var(--purple); }
 .roll-summary .s-plate { color: var(--green); }
 .roll-summary .s-cookoff { color: var(--red); }
-
 .btn-roll { background: linear-gradient(135deg, var(--golden), #ffb800); color: #1a0a00; font-size: 1.5rem; padding: 16px 60px; border-radius: 50px; box-shadow: 0 4px 20px rgba(247,201,72,0.4); animation: rollPulse 2s ease-in-out infinite; }
 .btn-roll:hover { box-shadow: 0 8px 35px rgba(247,201,72,0.6); animation: none; }
 @keyframes rollPulse { 0%, 100% { box-shadow: 0 4px 20px rgba(247,201,72,0.4); } 50% { box-shadow: 0 4px 35px rgba(247,201,72,0.7); } }
@@ -204,13 +197,13 @@ body::before {
 </head>
 <body>
 
-<!-- ==================== TITLE SCREEN ==================== -->
+<!-- TITLE SCREEN -->
 <div id="screen-title" class="screen active">
   <div class="title-float-container" id="floating-food"></div>
   <div class="title-logo">🍳 Too Many Cooks! 🔥</div>
   <div class="title-sub">~ La Cuisine Catastrophe ~</div>
   <div class="title-lore">
-    It's Saturday night at the world's most dysfunctional restaurant.
+    It’s Saturday night at the world’s most dysfunctional restaurant.
     The head chef quit, orders are piling up, and the health inspector arrives at midnight.<br><br>
     Each cook is drowning in orders — draw your cards to see what fate serves up.
     Plate a dish and send it out. Dump your mess on the next station.
@@ -221,18 +214,16 @@ body::before {
   <button class="btn btn-primary" onclick="showScreen('setup')">START COOKING! 🔥</button>
 </div>
 
-<!-- ==================== SETUP SCREEN ==================== -->
+<!-- SETUP SCREEN -->
 <div id="screen-setup" class="screen">
   <div class="setup-title">🧑‍🍳 Kitchen Setup</div>
   <p style="color:var(--text-muted); margin-bottom: 8px;">How many chefs in the kitchen?</p>
   <div class="count-selector" id="count-selector"></div>
   <div class="player-configs" id="player-configs"></div>
-  <button class="btn btn-primary" onclick="startGame()" style="margin-top: 10px;">
-    FIRE UP THE KITCHEN! 🔥
-  </button>
+  <button class="btn btn-primary" onclick="startGame()" style="margin-top: 10px;">FIRE UP THE KITCHEN! 🔥</button>
 </div>
 
-<!-- ==================== GAME SCREEN ==================== -->
+<!-- GAME SCREEN -->
 <div id="screen-game" class="screen">
   <div class="turn-banner" id="turn-banner"></div>
   <div class="player-stations" id="player-stations"></div>
@@ -247,7 +238,7 @@ body::before {
   <div class="cookoff-overlay" id="cookoff-overlay"></div>
 </div>
 
-<!-- ==================== VICTORY SCREEN ==================== -->
+<!-- VICTORY SCREEN -->
 <div id="screen-victory" class="screen">
   <div class="confetti-container" id="confetti-container"></div>
   <div class="victory-title">🏆 GOLDEN LADLE WINNER! 🏆</div>
@@ -257,217 +248,333 @@ body::before {
   <button class="btn btn-primary" onclick="showScreen('setup')">COOK AGAIN! 🍳</button>
 </div>
 
-// ── Cook-Off Overlay ──
-async function showCookoff(data){
-  const ov=$('co-overlay');
-  snd('clash');
+<script>
 
-  if(data.type==='new'){
-    const ch=pAt(data.from);
-    const nx=pAt(nextIdx(data.from));
-    const miniCards=Array(data.n).fill(makeCard(FACE.COOKOFF,true,true)).join('');
-    ov.innerHTML=`<div class="co-title">🔥 COOK-OFF CHALLENGE! 🔥</div>
-      <div class="co-versus">
-        <div class="co-side"><div class="side-name" style="color:${ch.color}">${ch.name}</div>
-          <div class="side-cards">${miniCards}</div>
-          <div class="side-count">${data.n} 🔥</div></div>
-        <div class="co-vs">➜</div>
-        <div class="co-side"><div class="side-name" style="color:${nx.color}">${nx.name}</div>
-          <div class="side-cards"><span style="font-size:2rem;opacity:.4">???</span></div>
-          <div class="side-count">?</div></div>
-      </div>
-      <div class="co-result">${ch.name} throws down ${data.n} order${data.n>1?'s':''}! Next chef must answer!</div>`;
-    ov.classList.add('active');await wait(2200);ov.classList.remove('active');return;
+const FACE = { TICKET: 0, DUMP: 1, PLATE: 2, COOKOFF: 3 };
+const FACE_DATA = [
+  { name: 'Ticket',   cls: 'ticket',  label: 'Still Cooking', color: '#b8a070' },
+  { name: 'Dump',     cls: 'dump',    label: 'Not My Problem!', color: '#A855F7' },
+  { name: 'Plate',    cls: 'plate',   label: 'Order Up!', color: '#10B981' },
+  { name: 'Cook-Off', cls: 'cookoff', label: 'COOK-OFF!', color: '#EF4444' },
+];
+const PLAYER_COLORS = ['#FF6B35','#4ECDC4','#E63946','#7209B7','#06D6A0','#F472B6'];
+const AI_CHEFS = [
+  { name: 'Bot-ardee',     quip: 'Mama mia!' },
+  { name: 'Gordon RAMsey', quip: "IT'S RAW!" },
+  { name: 'Sous-Vide Bot', quip: 'Precisely calculated.' },
+  { name: 'Chef Algo',     quip: 'Optimizing flavor...' },
+  { name: 'Wok-Bot',       quip: 'Wok and roll, baby!' },
+];
+const STARTING_CUBES = 10;
+const FOOD_EMOJIS = ['🍕','🌮','🍔','🍩','🧁','🥐','🍣','🍗','🥞','🧀','🌶️','🍟','🥚','🍰','🫕'];
+const FUNNY_DUMPS = [
+  '{name} yeets {count} order(s) at {next}! No refunds!',
+  "{name} slides {count} greasy ticket(s) onto {next}'s counter!",
+  '{name} dumps {count} nightmare order(s) on {next}. Sorry not sorry!',
+  'Order up! {name} shoves {count} ticket(s) at {next}!',
+  '{name} says "not my problem" and passes {count} to {next}!',
+];
+const FUNNY_PLATES = [
+  '{count} dish(es) plated! The crowd goes mild! 👏',
+  "{name} sends out {count} dish(es)! Somebody's eating tonight!",
+  'Ding ding! {count} order(s) UP! {name} is cooking! 🛎️',
+  '{name} plates {count}! Gordon would be... mildly less angry.',
+  '{count} dish(es) served with questionable garnish! 🌿',
+];
+
+const CARD_SVG = {
+  ticket: '<svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="22" cy="34" rx="14" ry="3" fill="rgba(0,0,0,0.15)"/><rect x="10" y="18" width="24" height="16" rx="2" fill="#8B7355" stroke="#6B5335" stroke-width="1.5"/><rect x="12" y="14" width="20" height="6" rx="1" fill="#A0522D" stroke="#6B5335" stroke-width="1"/><circle cx="16" cy="30" r="1" fill="#FF6B35"/><circle cx="22" cy="28" r="1.2" fill="#E63946"/><circle cx="28" cy="30" r="1" fill="#F7C948"/><path d="M18 14 Q18 8 22 6 Q26 8 26 14" fill="none" stroke="rgba(180,180,180,0.5)" stroke-width="1.5" stroke-linecap="round"/><path d="M20 12 Q20 7 22 5 Q24 7 24 12" fill="none" stroke="rgba(200,200,200,0.4)" stroke-width="1" stroke-linecap="round"/></svg>',
+  plate: '<svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="22" cy="32" rx="16" ry="5" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><path d="M8 28 Q8 20 22 18 Q36 20 36 28" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><ellipse cx="22" cy="28" rx="14" ry="4" fill="rgba(255,255,255,0.1)"/><path d="M12 24 Q22 12 32 24" fill="none" stroke="rgba(255,215,0,0.6)" stroke-width="1.5" stroke-dasharray="2 2"/><polygon points="18,6 19,9 22,9 20,11 21,14 18,12 15,14 16,11 14,9 17,9" fill="#F7C948" opacity="0.8"/><polygon points="28,4 28.7,6.5 31,6.5 29,8 29.7,10.5 28,9 26.2,10.5 26.8,8 25,6.5 27.3,6.5" fill="#F7C948" opacity="0.6"/></svg>',
+  dump: '<svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 20 Q6 18 8 16 L14 14 Q16 20 20 22 L28 24 Q30 22 32 24 L38 26" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round"/><ellipse cx="14" cy="28" rx="8" ry="3" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/><path d="M8 26 Q14 22 20 26" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1"/><line x1="30" y1="20" x2="38" y2="18" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/><line x1="30" y1="24" x2="40" y2="22" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linecap="round"/><line x1="30" y1="28" x2="38" y2="27" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  cookoff: '<svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 34 L18 10 L22 14 L26 10 L34 34" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="18" y1="10" x2="26" y2="34" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><line x1="26" y1="10" x2="18" y2="34" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><path d="M6 32 Q10 22 14 28 Q18 16 22 24 Q26 14 30 26 Q34 20 38 32" fill="rgba(255,100,0,0.4)" stroke="rgba(255,150,0,0.6)" stroke-width="1"/><path d="M10 34 Q16 26 22 30 Q28 24 34 34" fill="rgba(255,50,0,0.3)" stroke="none"/><circle cx="22" cy="8" r="2" fill="#F7C948" opacity="0.6"/></svg>',
+  back: '<svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="6" width="32" height="32" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3 2"/><text x="22" y="27" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="18" font-weight="bold" font-family="Fredoka,sans-serif">?</text></svg>'
+};
+
+const MINI_CARD_SVG = {
+  ticket: '<div class="rule-mini-card" style="background:linear-gradient(135deg,#f5e6c8,#e8d5a8);border:2px dashed #c4a060;">'+CARD_SVG.ticket+'</div>',
+  dump: '<div class="rule-mini-card" style="background:linear-gradient(135deg,#7C3AED,#A855F7);border:2px solid #c084fc;">'+CARD_SVG.dump+'</div>',
+  plate: '<div class="rule-mini-card" style="background:linear-gradient(135deg,#059669,#10B981);border:2px solid #F7C948;">'+CARD_SVG.plate+'</div>',
+  cookoff: '<div class="rule-mini-card" style="background:linear-gradient(135deg,#DC2626,#F97316);border:2px solid #fbbf24;">'+CARD_SVG.cookoff+'</div>',
+};
+
+let G = { players: [], currentIndex: 0, pendingMatch: null, phase: 'title', turnNumber: 0, stats: { totalPlated: 0, totalDumped: 0, totalCookoffs: 0, turns: 0 } };
+let selectedCount = 2;
+let isAnimating = false;
+
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function ensureAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
+function playSound(type) {
+  try {
+    ensureAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    const now = audioCtx.currentTime;
+    switch(type) {
+      case 'roll': o.type='square'; o.frequency.setValueAtTime(200,now); o.frequency.exponentialRampToValueAtTime(600,now+0.15); g.gain.setValueAtTime(0.08,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.2); o.start(now); o.stop(now+0.2); break;
+      case 'flip': o.type='sine'; o.frequency.setValueAtTime(600,now); o.frequency.exponentialRampToValueAtTime(900,now+0.1); g.gain.setValueAtTime(0.06,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.15); o.start(now); o.stop(now+0.15); break;
+      case 'plate': o.type='sine'; o.frequency.setValueAtTime(800,now); o.frequency.exponentialRampToValueAtTime(1200,now+0.15); g.gain.setValueAtTime(0.1,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.2); o.start(now); o.stop(now+0.2); break;
+      case 'dump': o.type='sawtooth'; o.frequency.setValueAtTime(300,now); o.frequency.exponentialRampToValueAtTime(100,now+0.2); g.gain.setValueAtTime(0.06,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.25); o.start(now); o.stop(now+0.25); break;
+      case 'cookoff': o.type='sawtooth'; o.frequency.setValueAtTime(150,now); o.frequency.linearRampToValueAtTime(400,now+0.3); g.gain.setValueAtTime(0.12,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.5); o.start(now); o.stop(now+0.5); break;
+      case 'win': o.type='square'; [523,659,784,1047].forEach((f,i)=>o.frequency.setValueAtTime(f,now+i*0.15)); g.gain.setValueAtTime(0.08,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.7); o.start(now); o.stop(now+0.7); break;
+      case 'clash': o.type='sawtooth'; o.frequency.setValueAtTime(80,now); g.gain.setValueAtTime(0.15,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.4); o.start(now); o.stop(now+0.4); break;
+    }
+  } catch(e) {}
+}
+
+const $ = id => document.getElementById(id);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function tmpl(str, vars) { return str.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? ''); }
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $('screen-' + name).classList.add('active');
+  G.phase = name;
+  if (name === 'setup') initSetup();
+}
+
+function initTitleScreen() {
+  const c = $('floating-food'); c.innerHTML = '';
+  for (let i = 0; i < 20; i++) {
+    const el = document.createElement('div');
+    el.className = 'title-float';
+    el.textContent = pick(FOOD_EMOJIS);
+    el.style.left = Math.random()*100+'%';
+    el.style.animationDuration = (8+Math.random()*12)+'s';
+    el.style.animationDelay = (Math.random()*10)+'s';
+    el.style.fontSize = (1.2+Math.random()*1.5)+'rem';
+    c.appendChild(el);
   }
+  $('title-rules').innerHTML =
+    '<div class="rule-card">'+MINI_CARD_SVG.ticket+'<span class="rule-text"><strong>Ticket ×3</strong><br>Order stays at your station</span></div>'+
+    '<div class="rule-card">'+MINI_CARD_SVG.dump+'<span class="rule-text"><strong>Dump ×1</strong><br>Pass to next chef!</span></div>'+
+    '<div class="rule-card">'+MINI_CARD_SVG.plate+'<span class="rule-text"><strong>Plate ×1</strong><br>Served! Gone forever</span></div>'+
+    '<div class="rule-card">'+MINI_CARD_SVG.cookoff+'<span class="rule-text"><strong>Cook-Off ×1</strong><br>Showdown! Loser eats all</span></div>';
+}
 
+function initSetup() {
+  const sel=$('count-selector'); sel.innerHTML='';
+  for(let i=2;i<=6;i++){const b=document.createElement('button');b.className='count-btn'+(i===selectedCount?' selected':'');b.textContent=i;b.onclick=()=>{selectedCount=i;initSetup();};sel.appendChild(b);}
+  const cfg=$('player-configs'); cfg.innerHTML='';
+  const shuffledAI=[...AI_CHEFS].sort(()=>Math.random()-0.5);
+  for(let i=0;i<selectedCount;i++){
+    const row=document.createElement('div');row.className='player-row';row.style.borderLeftColor=PLAYER_COLORS[i];row.style.animationDelay=(i*0.08)+'s';
+    const isFirst=i===0;const aiName=shuffledAI[i%shuffledAI.length].name;
+    row.innerHTML='<span class="chef-hat">👨‍🍳</span><input type="text" id="pname-'+i+'" placeholder="'+(isFirst?'Your name':'Chef '+(i+1))+'" value="'+(isFirst?'':aiName)+'" maxlength="16">'+(isFirst?'<span style="font-size:0.8rem;color:var(--text-muted);">YOU</span>':'<label class="ai-toggle"><input type="checkbox" id="pai-'+i+'" checked><span class="toggle-track"><span class="toggle-thumb"></span></span>AI</label>');
+    cfg.appendChild(row);
+  }
+}
+
+function startGame() {
+  const players=[];
+  for(let i=0;i<selectedCount;i++){
+    const nameEl=$('pname-'+i);const aiEl=$('pai-'+i);
+    const name=(nameEl.value.trim()||('Chef '+(i+1)));
+    players.push({name,index:i,cubes:STARTING_CUBES,isAI:i===0?false:(aiEl?aiEl.checked:true),color:PLAYER_COLORS[i]});
+  }
+  G.players=players;G.currentIndex=Math.floor(Math.random()*players.length);G.pendingMatch=null;G.turnNumber=0;
+  G.stats={totalPlated:0,totalDumped:0,totalCookoffs:0,turns:0};
+  $('game-log').innerHTML='';showScreen('game');beginTurn();
+}
+
+function nextPlayerIndex(from){return(from+1)%G.players.length;}
+function getPlayer(i){return G.players[i];}
+function currentPlayer(){return G.players[G.currentIndex];}
+
+function renderStations() {
+  const c=$('player-stations');c.innerHTML='';
+  G.players.forEach((p,i)=>{
+    const div=document.createElement('div');div.className='station'+(i===G.currentIndex?' active':'');div.id='station-'+i;
+    const pc=Math.min(p.cubes,6);let pile='';
+    for(let j=0;j<pc;j++){pile+='<div class="pile-card" style="left:'+(j*3)+'px;transform:rotate('+((j-pc/2)*4)+'deg);z-index:'+j+';"></div>';}
+    div.innerHTML='<style>.station:nth-child('+(i+1)+')::before{background:'+p.color+';}</style><div class="station-name"><span style="color:'+p.color+'">'+(p.isAI?'🤖':'🧑‍🍳')+'</span> '+p.name+'</div><div class="station-count" id="count-'+i+'">'+p.cubes+'<small> card'+(p.cubes!==1?'s':'')+'</small></div><div class="station-pile">'+pile+'</div>';
+    if(p.cubes===0)div.classList.add('winner');c.appendChild(div);
+  });
+}
+
+function flashStation(index,color,text){
+  const s=$('station-'+index);if(!s)return;
+  const f=document.createElement('div');f.className='station-flash';s.appendChild(f);setTimeout(()=>f.remove(),500);
+  if(text){const ch=document.createElement('div');ch.className='station-count-change';ch.style.color=color||'white';ch.textContent=text;s.appendChild(ch);setTimeout(()=>ch.remove(),1600);}
+}
+
+function renderPendingIndicator(){
+  const el=$('pending-indicator');
+  if(G.pendingMatch){const ch=getPlayer(G.pendingMatch.challengerIndex);el.style.display='block';el.innerHTML='🔥 '+G.pendingMatch.count+' Cook-Off card'+(G.pendingMatch.count>1?'s':'')+' from <strong>'+ch.name+'</strong> — you must answer the challenge!';}
+  else{el.style.display='none';}
+}
+
+function addLog(msg,cls){const log=$('game-log');const div=document.createElement('div');div.className='log-entry'+(cls?' '+cls:'');div.innerHTML=msg;log.appendChild(div);log.scrollTop=log.scrollHeight;}
+
+function rollCards(count){const r=[];for(let i=0;i<count;i++){const v=Math.random()*6;if(v<3)r.push(FACE.TICKET);else if(v<4)r.push(FACE.DUMP);else if(v<5)r.push(FACE.PLATE);else r.push(FACE.COOKOFF);}return r;}
+function countFaces(results){const c=[0,0,0,0];results.forEach(f=>c[f]++);return{tickets:c[0],dumps:c[1],plates:c[2],cookoffs:c[3]};}
+
+async function animateCards(results) {
+  const area = $('card-area'); area.innerHTML = '';
+  for (let i = 0; i < results.length; i++) {
+    const f = FACE_DATA[results[i]];
+    const el = document.createElement('div');
+    el.className = 'card-container card-' + f.cls;
+    el.style.opacity = '0';
+    el.style.transform = 'rotate(' + ((Math.random()-0.5)*8) + 'deg)';
+    el.innerHTML = '<div class="card-inner"><div class="card-face card-back">'+CARD_SVG.back+'</div><div class="card-face card-front"><div class="card-svg">'+CARD_SVG[f.cls]+'</div><div class="card-label">'+f.label+'</div></div></div>';
+    area.appendChild(el);
+    setTimeout(((e)=>()=>{e.style.transition='opacity 0.2s,transform 0.3s';e.style.opacity='1';e.style.transform='rotate('+((Math.random()-0.5)*6)+'deg)';})(el), i*40);
+  }
+  playSound('roll');
+  await wait(300 + results.length * 40);
+
+  const cards = area.querySelectorAll('.card-inner');
+  for (let i = 0; i < cards.length; i++) {
+    setTimeout(((c)=>()=>{c.classList.add('flipped');playSound('flip');})(cards[i]), i*80);
+  }
+  await wait(500 + cards.length * 80);
+
+  const sorted = [...results].map((f,i)=>({face:f,idx:i}));
+  sorted.sort((a,b)=>{const o=[FACE.COOKOFF,FACE.DUMP,FACE.PLATE,FACE.TICKET];return o.indexOf(a.face)-o.indexOf(b.face);});
+  area.innerHTML = '';
+  sorted.forEach((item,i) => {
+    const f = FACE_DATA[item.face];
+    const el = document.createElement('div');
+    el.className = 'card-container card-' + f.cls;
+    el.dataset.face = item.face;
+    el.innerHTML = '<div class="card-inner flipped"><div class="card-face card-back">'+CARD_SVG.back+'</div><div class="card-face card-front"><div class="card-svg">'+CARD_SVG[f.cls]+'</div><div class="card-label">'+f.label+'</div></div></div>';
+    el.style.animation = 'cardSettle 0.3s ease-out '+(i*0.04)+'s both';
+    area.appendChild(el);
+  });
+  await wait(400);
+  return area;
+}
+
+async function animateResolution(area, counts) {
+  const cs = area.querySelectorAll('.card-container');
+  if (counts.plates > 0) {
+    let d=0;cs.forEach(c=>{if(+c.dataset.face===FACE.PLATE){setTimeout(()=>{c.classList.add('card-fly-up');const ft=document.createElement('div');ft.className='floating-text';ft.style.color='#10B981';ft.textContent='+1 served!';ft.style.left=c.offsetLeft+'px';ft.style.top=c.offsetTop+'px';area.appendChild(ft);setTimeout(()=>ft.remove(),1200);},d);d+=120;}});
+    playSound('plate');await wait(300+d);
+  }
+  if (counts.dumps > 0) {
+    let d=0;cs.forEach(c=>{if(+c.dataset.face===FACE.DUMP){setTimeout(()=>c.classList.add('card-fly-right'),d);d+=120;}});
+    playSound('dump');await wait(300+d);
+  }
+  if (counts.cookoffs > 0) {
+    cs.forEach(c=>{if(+c.dataset.face===FACE.COOKOFF)c.classList.add('card-fly-center');});
+    playSound('cookoff');await wait(400);
+  }
+  cs.forEach(c=>{if(+c.dataset.face===FACE.TICKET)c.classList.add('card-settle');});
+  await wait(300);
+}
+
+function showRollSummary(counts) {
+  const el=$('roll-summary');const p=[];
+  if(counts.tickets>0)p.push('<span class="s-ticket">📋×'+counts.tickets+'</span>');
+  if(counts.dumps>0)p.push('<span class="s-dump">🫳×'+counts.dumps+'</span>');
+  if(counts.plates>0)p.push('<span class="s-plate">🍽️×'+counts.plates+'</span>');
+  if(counts.cookoffs>0)p.push('<span class="s-cookoff">🔥×'+counts.cookoffs+'</span>');
+  el.innerHTML=p.join('  ');
+}
+
+function makeCookoffCards(count,faceDown){
+  let h='';const si=CARD_SVG.cookoff.replace(/<\/?svg[^>]*>/g,'');
+  for(let i=0;i<count;i++){if(faceDown){h+='<div class="co-card face-down">'+CARD_SVG.back+'</div>';}else{h+='<div class="co-card"><svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">'+si+'</svg></div>';}}return h;
+}
+
+async function showCookoff(data) {
+  const ov=$('cookoff-overlay');playSound('clash');
+  if(data.type==='new_challenge'){
+    const ch=getPlayer(data.challenger);const np=getPlayer(nextPlayerIndex(data.challenger));
+    ov.innerHTML='<div class="cookoff-title">🔥 COOK-OFF CHALLENGE! 🔥</div><div class="cookoff-versus"><div class="cookoff-side"><div class="side-name" style="color:'+ch.color+'">'+ch.name+'</div><div class="side-cards">'+makeCookoffCards(data.count,false)+'</div></div><div class="cookoff-vs">➡</div><div class="cookoff-side"><div class="side-name" style="color:'+np.color+'">'+np.name+'</div><div class="side-cards">'+makeCookoffCards(data.count,true)+'</div></div></div><div class="cookoff-result">'+ch.name+' throws down '+data.count+' card'+(data.count>1?'s':'')+'. Next chef must answer!</div>';
+    ov.classList.add('active');await wait(2500);ov.classList.remove('active');return;
+  }
   if(data.type==='tie'){
-    const nx=pAt(nextIdx(G.cur));
-    const leftCards=Array(data.chN).fill(makeCard(FACE.COOKOFF,true,true)).join('');
-    const rightCards=Array(data.defN).fill(makeCard(FACE.COOKOFF,true,true)).join('');
-    ov.innerHTML=`<div class="co-title">⚡ TIE — REMATCH! ⚡</div>
-      <div class="co-versus">
-        <div class="co-side"><div class="side-name">Pending</div>
-          <div class="side-cards">${leftCards}</div>
-          <div class="side-count">${data.chN} 🔥</div></div>
-        <div class="co-vs">VS</div>
-        <div class="co-side"><div class="side-name" style="color:${curP().color}">${curP().name}</div>
-          <div class="side-cards">${rightCards}</div>
-          <div class="side-count">${data.defN} 🔥</div></div>
-      </div>
-      <div class="co-result" style="color:var(--gold)">DEAD HEAT! ${data.total} cards cascade to ${nx.name}! 🔥🔥🔥</div>`;
-    ov.classList.add('active');snd('cookoff');await wait(2800);ov.classList.remove('active');return;
+    const np=getPlayer(nextPlayerIndex(G.currentIndex));
+    ov.innerHTML='<div class="cookoff-title">⚡ TIE — REMATCH! ⚡</div><div class="cookoff-versus"><div class="cookoff-side"><div class="side-name">Challenger</div><div class="side-cards">'+makeCookoffCards(data.challengerCount,false)+'</div></div><div class="cookoff-vs">VS</div><div class="cookoff-side"><div class="side-name" style="color:'+currentPlayer().color+'">'+currentPlayer().name+'</div><div class="side-cards">'+makeCookoffCards(data.defenderCount,false)+'</div></div></div><div class="cookoff-result" style="color:var(--golden);">DEAD HEAT! '+data.total+' cards cascade to '+np.name+'! 🔥🔥🔥</div>';
+    ov.classList.add('active');playSound('cookoff');await wait(3000);ov.classList.remove('active');return;
   }
-
-  // Win / lose
-  const winner=pAt(data.winner),loser=pAt(data.loser);
-  const leftP=data.type==='def_wins'?loser:winner;
-  const leftCards=Array(data.chN).fill(makeCard(FACE.COOKOFF,true,true)).join('');
-  const rightCards=Array(data.defN).fill(makeCard(FACE.COOKOFF,true,true)).join('');
-  ov.innerHTML=`<div class="co-title">🔥 COOK-OFF! 🔥</div>
-    <div class="co-versus">
-      <div class="co-side" id="co-l"><div class="side-name" style="color:${leftP.color}">${leftP.name}</div>
-        <div class="side-cards">${leftCards}</div>
-        <div class="side-count">${data.chN} 🔥</div></div>
-      <div class="co-vs">VS</div>
-      <div class="co-side" id="co-r"><div class="side-name" style="color:${curP().color}">${curP().name}</div>
-        <div class="side-cards">${rightCards}</div>
-        <div class="side-count">${data.defN} 🔥</div></div>
-    </div>
-    <div class="co-result" id="co-res" style="opacity:0"></div>`;
-  ov.classList.add('active');snd('cookoff');await wait(1500);
-
-  const lIsW=data.winner!==G.cur;
-  const lEl=ov.querySelector('#co-l'),rEl=ov.querySelector('#co-r');
-  if(lIsW){lEl.classList.add('winner-side');rEl.classList.add('loser-side')}
-  else{rEl.classList.add('winner-side');lEl.classList.add('loser-side')}
-  const res=ov.querySelector('#co-res');
-  res.style.opacity='1';
-  res.innerHTML=`💥 ${winner.name} wins! ${loser.name} drowns in <strong>${data.total}</strong> orders!`;
-  snd('win');await wait(2600);ov.classList.remove('active');
+  const winner=getPlayer(data.winner);const loser=getPlayer(data.loser);const leftP=data.type==='defender_wins'?loser:winner;
+  ov.innerHTML='<div class="cookoff-title">🔥 COOK-OFF! 🔥</div><div class="cookoff-versus"><div class="cookoff-side" id="co-left"><div class="side-name" style="color:'+leftP.color+'">'+leftP.name+'</div><div class="side-cards">'+makeCookoffCards(data.challengerCount,false)+'</div></div><div class="cookoff-vs">VS</div><div class="cookoff-side" id="co-right"><div class="side-name" style="color:'+currentPlayer().color+'">'+currentPlayer().name+'</div><div class="side-cards" id="co-right-cards">'+makeCookoffCards(data.defenderCount,true)+'</div></div></div><div class="cookoff-result" id="co-result" style="opacity:0;"></div>';
+  ov.classList.add('active');playSound('cookoff');await wait(1200);
+  const rc=ov.querySelector('#co-right-cards');
+  if(rc){const fd=rc.querySelectorAll('.face-down');const si=CARD_SVG.cookoff.replace(/<\/?svg[^>]*>/g,'');for(let i=0;i<fd.length;i++){await wait(300);fd[i].classList.remove('face-down');fd[i].style.background='linear-gradient(135deg,#DC2626,#F97316)';fd[i].style.border='2px solid #fbbf24';fd[i].innerHTML='<svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">'+si+'</svg>';playSound('flip');}}
+  await wait(600);
+  const liw=(data.winner!==G.currentIndex);const le=ov.querySelector('#co-left');const re=ov.querySelector('#co-right');
+  if(liw){le.classList.add('winner-side');re.classList.add('loser-side');}else{re.classList.add('winner-side');le.classList.add('loser-side');}
+  const res=ov.querySelector('#co-result');res.style.opacity='1';res.innerHTML='💥 '+winner.name+' wins! '+loser.name+' drowns in <strong>'+data.total+'</strong> orders!';
+  playSound('win');await wait(2800);ov.classList.remove('active');
 }
 
-// ── Turn Flow ──
-function beginTurn(){
-  animating=false;
-  const p=curP();
-
-  if(p.cubes<=0){
-    p.cubes=0;
-    if(G.pendingMatch)G.pendingMatch=null;
-    victory(G.cur);return;
-  }
-
-  G.turnN++;G.stats.turns++;
-  renderStations();renderPending();
-
+function beginTurn() {
+  isAnimating=false;const p=currentPlayer();
+  if(p.cubes<=0){p.cubes=0;if(G.pendingMatch)G.pendingMatch=null;victory(G.currentIndex);return;}
+  G.turnNumber++;G.stats.turns++;renderStations();renderPendingIndicator();
   $('card-area').innerHTML='';$('roll-summary').innerHTML='';
-  $('turn-banner').innerHTML=`${p.isAI?'🤖':'🧑‍🍳'} <span style="color:${p.color}">${p.name}</span>'s Turn!`;
+  $('turn-banner').innerHTML=(p.isAI?'🤖':'🧑‍🍳')+' <span style="color:'+p.color+'">'+p.name+"</span>'s Turn!";
   $('turn-banner').style.borderColor=p.color;
-
-  $('btn-roll').classList.remove('hidden');
-  $('btn-next').classList.add('hidden');
-
-  if(p.isAI){
-    $('btn-roll').classList.add('hidden');
-    log(`🤖 ${p.name} sizes up the kitchen...`);
-    setTimeout(()=>doRoll(),800+Math.random()*600);
-  }
+  $('btn-roll').classList.remove('hidden');$('btn-continue').classList.add('hidden');
+  if(p.isAI){$('btn-roll').classList.add('hidden');addLog('🤖 '+p.name+' sizes up the kitchen...');setTimeout(()=>doRoll(),800+Math.random()*600);}
 }
 
-async function doRoll(){
-  if(animating)return;
-  animating=true;
-  const p=curP(),ni=nextIdx(G.cur),np=pAt(ni);
-  $('btn-roll').classList.add('hidden');
+async function doRoll() {
+  if(isAnimating)return;
+  isAnimating=true;$('btn-roll').classList.add('hidden');$('btn-continue').classList.add('hidden');
+  const p=currentPlayer();const nextIdx=nextPlayerIndex(G.currentIndex);const nextP=getPlayer(nextIdx);
+  try {
+    const results=rollCards(p.cubes);const counts=countFaces(results);
+    addLog('🃏 '+p.name+' draws '+p.cubes+' card'+(p.cubes>1?'s':'')+'!');
+    const area=await animateCards(results);showRollSummary(counts);await wait(300);
+    await animateResolution(area,counts);await wait(200);
 
-  try{
-    const results=roll(p.cubes);
-    const c=count(results);
-    log(`🎲 ${p.name} flips ${p.cubes} card${p.cubes>1?'s':''}!`);
+    if(counts.plates>0){p.cubes-=counts.plates;G.stats.totalPlated+=counts.plates;addLog('🍽️ '+tmpl(pick(FUNNY_PLATES),{name:p.name,count:counts.plates}));flashStation(G.currentIndex,'#10B981','-'+counts.plates);}
+    if(counts.dumps>0){p.cubes-=counts.dumps;nextP.cubes+=counts.dumps;G.stats.totalDumped+=counts.dumps;addLog('🫳 '+tmpl(pick(FUNNY_DUMPS),{name:p.name,count:counts.dumps,next:nextP.name}));flashStation(G.currentIndex,'#A855F7','-'+counts.dumps);flashStation(nextIdx,'#A855F7','+'+counts.dumps);}
+    if(counts.cookoffs>0){p.cubes-=counts.cookoffs;}
+    renderStations();await wait(300);
 
-    // Animate deal & flip
-    await animateCards(results);
-    showSummary(c);
-    await wait(300);
-
-    // Animate cards flying to destinations
-    await animateResolution(c);
-    await wait(200);
-
-    // ── Resolve ──
-    if(c.plates>0){
-      p.cubes-=c.plates;G.stats.plated+=c.plates;
-      log('🍽️ '+tmpl(pick(PLATE_MSGS),{name:p.name,n:c.plates}));
-    }
-    if(c.dumps>0){
-      p.cubes-=c.dumps;np.cubes+=c.dumps;G.stats.dumped+=c.dumps;
-      log('🫳 '+tmpl(pick(DUMP_MSGS),{name:p.name,n:c.dumps,next:np.name}));
-    }
-    if(c.cookoffs>0)p.cubes-=c.cookoffs;
-    renderStations();await wait(200);
-
-    // ── Cook-Off ──
-    let coR=null;
+    let cr=null;
     if(G.pendingMatch){
-      const pm=G.pendingMatch,total=pm.n+c.cookoffs;
-      if(c.cookoffs>pm.n){
-        const ch=pAt(pm.from);if(ch.cubes>0)ch.cubes+=total;
-        coR={type:'def_wins',winner:G.cur,loser:pm.from,total,chN:pm.n,defN:c.cookoffs};
-        G.pendingMatch=null;
-      }else if(c.cookoffs<pm.n){
-        p.cubes+=total;
-        coR={type:'def_loses',winner:pm.from,loser:G.cur,total,chN:pm.n,defN:c.cookoffs};
-        G.pendingMatch=null;
-      }else{
-        G.pendingMatch={n:total,from:G.cur};
-        coR={type:'tie',total,chN:pm.n,defN:c.cookoffs};
-      }
-      G.stats.cookoffs++;
-    }else if(c.cookoffs>0){
-      G.pendingMatch={n:c.cookoffs,from:G.cur};
-      coR={type:'new',n:c.cookoffs,from:G.cur};
+      const pm=G.pendingMatch;const total=pm.count+counts.cookoffs;
+      if(counts.cookoffs>pm.count){const ch=getPlayer(pm.challengerIndex);if(ch.cubes>0)ch.cubes+=total;cr={type:'defender_wins',winner:G.currentIndex,loser:pm.challengerIndex,total,defenderCount:counts.cookoffs,challengerCount:pm.count};G.pendingMatch=null;}
+      else if(counts.cookoffs<pm.count){p.cubes+=total;cr={type:'defender_loses',winner:pm.challengerIndex,loser:G.currentIndex,total,defenderCount:counts.cookoffs,challengerCount:pm.count};G.pendingMatch=null;}
+      else{G.pendingMatch={count:total,challengerIndex:G.currentIndex};cr={type:'tie',total,challengerCount:pm.count,defenderCount:counts.cookoffs};}
+      G.stats.totalCookoffs++;
+    } else if(counts.cookoffs>0){G.pendingMatch={count:counts.cookoffs,challengerIndex:G.currentIndex};cr={type:'new_challenge',count:counts.cookoffs,challenger:G.currentIndex};}
+
+    if(cr){
+      if(cr.type==='new_challenge')addLog('🔥 '+p.name+' challenges '+nextP.name+' with '+cr.count+' Cook-Off card'+(cr.count>1?'s':'')+'!','log-cookoff');
+      else if(cr.type==='tie')addLog('⚡ TIE! '+cr.total+' cards cascade to '+getPlayer(nextPlayerIndex(G.currentIndex)).name+'!','log-cookoff');
+      else{addLog('💥 '+getPlayer(cr.winner).name+' wins the Cook-Off! '+getPlayer(cr.loser).name+' eats '+cr.total+' orders!','log-cookoff');}
+      await showCookoff(cr);
+      if(cr.loser!==undefined)flashStation(cr.loser,'#EF4444','+'+cr.total);
     }
-
-    if(coR){
-      if(coR.type==='new')log(`🔥 ${p.name} challenges ${np.name} with ${coR.n} Cook-Off card${coR.n>1?'s':''}!`,'log-cookoff');
-      else if(coR.type==='tie')log(`⚡ TIE! ${coR.total} cards cascade to ${pAt(nextIdx(G.cur)).name}!`,'log-cookoff');
-      else{const w=pAt(coR.winner),l=pAt(coR.loser);log(`💥 ${w.name} wins the Cook-Off! ${l.name} eats ${coR.total} orders!`,'log-cookoff')}
-      await showCookoff(coR);
-    }
-
-    renderStations();renderPending();
-
-    // AI quip
-    if(p.isAI){const ch=AI_NAMES.find(c=>p.name.includes(c.name));if(ch&&Math.random()>.5)log(`💬 ${p.name}: "${ch.quip}"`)}
-
-    // Win check
-    if(p.cubes<=0){p.cubes=0;await wait(500);victory(G.cur);return}
-
-  }catch(err){
-    console.error('Roll error:',err);
-    log('⚠️ Something went wrong! Moving on...');
-  }finally{
-    // ALWAYS show continue button
-    $('btn-next').classList.remove('hidden');
-    $('btn-roll').classList.add('hidden');
-    animating=false;
-    if(curP().isAI)setTimeout(()=>nextTurn(),900);
+    renderStations();renderPendingIndicator();
+    if(p.isAI){const chef=AI_CHEFS.find(c=>p.name.includes(c.name));if(chef&&Math.random()>0.5)addLog('💬 '+p.name+': "'+chef.quip+'"');}
+    if(p.cubes<=0){p.cubes=0;await wait(500);victory(G.currentIndex);return;}
+  } catch(err) {
+    console.error('doRoll error:',err);
+    addLog('⚠️ Something went wrong — continuing...');
+  } finally {
+    $('btn-continue').classList.remove('hidden');
+    isAnimating=false;
+    if(currentPlayer().isAI&&G.phase==='game')setTimeout(()=>nextTurn(),1000+Math.random()*500);
   }
 }
 
-function nextTurn(){
-  if(animating)return;
-  G.cur=nextIdx(G.cur);
-  beginTurn();
-}
+function nextTurn(){if(isAnimating)return;G.currentIndex=nextPlayerIndex(G.currentIndex);beginTurn();}
 
-// ── Victory ──
-function victory(wi){
-  const p=pAt(wi);
-  log(`🏆 ${p.name} CLEARED THE STATION! GOLDEN LADLE WINNER!!! 🏆`,'log-win');
-  snd('win');
-  $('winner-box').innerHTML=`<span style="color:${p.color}">${p.isAI?'🤖':'🧑‍🍳'} ${p.name}</span>`;
-  $('stats-box').innerHTML=`
-    <div class="stat"><div class="val">${G.stats.turns}</div><div class="lbl">Turns</div></div>
-    <div class="stat"><div class="val">${G.stats.plated}</div><div class="lbl">Plated 🍽️</div></div>
-    <div class="stat"><div class="val">${G.stats.dumped}</div><div class="lbl">Dumped 🫳</div></div>
-    <div class="stat"><div class="val">${G.stats.cookoffs}</div><div class="lbl">Cook-Offs 🔥</div></div>`;
-  // Confetti
-  const cc=$('confetti-box');cc.innerHTML='';
+function victory(winnerIndex) {
+  const p=getPlayer(winnerIndex);
+  addLog('🏆 '+p.name+' CLEARED THE STATION! GOLDEN LADLE WINNER!!! 🏆','log-win');
+  playSound('win');
+  $('winner-display').innerHTML='<span style="color:'+p.color+'">'+(p.isAI?'🤖':'🧑‍🍳')+' '+p.name+'</span>';
+  $('victory-stats').innerHTML='<div class="stat-card"><div class="stat-val">'+G.stats.turns+'</div><div class="stat-label">Total Turns</div></div><div class="stat-card"><div class="stat-val">'+G.stats.totalPlated+'</div><div class="stat-label">Dishes Plated 🍽️</div></div><div class="stat-card"><div class="stat-val">'+G.stats.totalDumped+'</div><div class="stat-label">Orders Dumped 🫳</div></div><div class="stat-card"><div class="stat-val">'+G.stats.totalCookoffs+'</div><div class="stat-label">Cook-Offs 🔥</div></div>';
+  const cc=$('confetti-container');cc.innerHTML='';
   const cols=['#FF6B35','#F7C948','#E63946','#10B981','#8B5CF6','#4ECDC4','#F472B6','#FFD166'];
-  for(let i=0;i<80;i++){
-    const p=document.createElement('div');p.className='confetti';
-    p.style.left=Math.random()*100+'%';p.style.background=pick(cols);
-    p.style.animationDuration=(2+Math.random()*3)+'s';
-    p.style.animationDelay=(Math.random()*2)+'s';
-    p.style.width=(6+Math.random()*8)+'px';p.style.height=(6+Math.random()*8)+'px';
-    p.style.borderRadius=Math.random()>.5?'50%':'2px';cc.appendChild(p);
-  }
+  for(let i=0;i<80;i++){const pc=document.createElement('div');pc.className='confetti-piece';pc.style.left=Math.random()*100+'%';pc.style.background=cols[Math.floor(Math.random()*cols.length)];pc.style.animationDuration=(2+Math.random()*3)+'s';pc.style.animationDelay=(Math.random()*2)+'s';pc.style.width=(6+Math.random()*8)+'px';pc.style.height=(6+Math.random()*8)+'px';pc.style.borderRadius=Math.random()>0.5?'50%':'2px';cc.appendChild(pc);}
   showScreen('victory');
 }
 
-// ── Init ──
-initFloats();
+initTitleScreen();
+
 </script>
 </body>
 </html>
