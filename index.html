@@ -96,6 +96,16 @@ body::before {
 @keyframes stationFlash { 0% { opacity: 0.6; } 100% { opacity: 0; } }
 .station-count-change { font-size: 0.85rem; font-weight: 700; animation: countChange 1.5s ease-out forwards; position: absolute; right: 10px; top: 40%; pointer-events: none; }
 @keyframes countChange { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-24px); } }
+/* Floating big numbers on stations */
+.station-float { position:absolute;z-index:30;font-size:1.8rem;font-weight:800;pointer-events:none;text-shadow:0 2px 8px rgba(0,0,0,.6);animation:floatBigNum 1.4s ease-out forwards;white-space:nowrap; }
+@keyframes floatBigNum { 0%{opacity:1;transform:translateY(0) scale(.7);} 20%{opacity:1;transform:translateY(-8px) scale(1.2);} 100%{opacity:0;transform:translateY(-50px) scale(1);} }
+/* Count punch animation */
+.station-count.count-punch { animation:countPunch .4s ease-out; }
+@keyframes countPunch { 0%{transform:scale(1)} 40%{transform:scale(1.6)} 100%{transform:scale(1)} }
+.station-count.count-shrink { animation:countShrink .4s ease-out; }
+@keyframes countShrink { 0%{transform:scale(1);opacity:1} 40%{transform:scale(.5);opacity:.3} 100%{transform:scale(1);opacity:1} }
+/* Group type label */
+.group-label { position:absolute;top:-28px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);color:var(--text-warm);padding:4px 14px;border-radius:8px;font-size:.85rem;font-weight:600;white-space:nowrap;z-index:20;animation:fadeIn .3s ease-out;pointer-events:none; }
 
 /* Kitchen + Cards */
 .kitchen-area { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 20px; width: 100%; max-width: 800px; border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; align-items: center; min-height: 260px; position: relative; overflow: hidden; }
@@ -459,77 +469,124 @@ async function resolveCardsOneByOne(area, results, p, nextP, nextIdx) {
   const curStation = document.getElementById('station-'+G.currentIndex);
   const nxStation = document.getElementById('station-'+nextIdx);
 
-  // Process sorted: plates first, then dumps, then tickets, then cookoffs last
+  // Group cards by type, in order: plates, dumps, tickets, cookoffs
   const order = [FACE.PLATE, FACE.DUMP, FACE.TICKET, FACE.COOKOFF];
-  const sorted = cs.slice().sort((a,b)=>order.indexOf(+a.dataset.face)-order.indexOf(+b.dataset.face));
+  const groups = {};
+  order.forEach(f=>groups[f]=[]);
+  cs.forEach(c=>{const f=+c.dataset.face;if(groups[f])groups[f].push(c);});
 
-  for (const card of sorted) {
-    const face = +card.dataset.face;
-    // Highlight this card
-    card.classList.add('resolving');
-    await wait(250);
+  const typeLabels={};
+  typeLabels[FACE.PLATE]='🍽️ Order Ready!';
+  typeLabels[FACE.DUMP]='🫳 Not My Problem!';
+  typeLabels[FACE.TICKET]='📋 Still Cooking...';
+  typeLabels[FACE.COOKOFF]='🔥 Cook-Off!';
+  const typeColors={};
+  typeColors[FACE.PLATE]='#10B981';
+  typeColors[FACE.DUMP]='#A855F7';
+  typeColors[FACE.TICKET]='#F7C948';
+  typeColors[FACE.COOKOFF]='#EF4444';
 
-    if (face === FACE.PLATE) {
-      setStatus('🍽️ Order Ready! Served to the customer!');
-      p.cubes--; G.stats.totalPlated++;
+  for (const faceType of order) {
+    const cards = groups[faceType];
+    if (cards.length === 0) continue;
+    const n = cards.length;
+    const col = typeColors[faceType];
+
+    // Show group label over card area
+    setStatus(typeLabels[faceType] + ' ×' + n);
+
+    // Highlight all cards of this type
+    cards.forEach(c=>c.classList.add('resolving'));
+    await wait(400);
+
+    if (faceType === FACE.PLATE) {
+      // All plates fly up, station count shrinks then updates
+      p.cubes -= n; G.stats.totalPlated += n;
       playSound('plate');
-      card.classList.remove('resolving');
-      card.classList.add('card-fly-up','resolved-fly');
-      if(curStation){blinkStation(curStation,'blink-green');}
+      cards.forEach(c=>{c.classList.remove('resolving');c.classList.add('card-fly-up','resolved-fly');});
+      punchCount(G.currentIndex, -n, col);
+      if(curStation) blinkStation(curStation,'blink-green');
+      floatNumber(curStation, '-'+n, col);
       updateStationCount(G.currentIndex, p.cubes);
+      await wait(500);
+
+    } else if (faceType === FACE.DUMP) {
+      p.cubes -= n; nextP.cubes += n; G.stats.totalDumped += n;
+      playSound('dump');
+      // Fly each dump card to next station with a stagger
+      for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        card.classList.remove('resolving');
+        if(nxStation){
+          const cRect=card.getBoundingClientRect();
+          const sRect=nxStation.getBoundingClientRect();
+          const dx=sRect.left+sRect.width/2-cRect.left-cRect.width/2;
+          const dy=sRect.top+sRect.height/2-cRect.top-cRect.height/2;
+          card.classList.add('resolved-fly');card.style.zIndex='20';
+          card.animate([
+            {transform:'translate(0,0) scale(1)',opacity:1},
+            {transform:'translate('+dx+'px,'+dy+'px) scale(0.3)',opacity:0}
+          ],{duration:450,easing:'ease-in',fill:'forwards'});
+        } else { card.classList.add('resolved'); }
+        await wait(120);
+      }
+      punchCount(G.currentIndex, -n, col);
+      floatNumber(curStation, '-'+n, col);
+      updateStationCount(G.currentIndex, p.cubes);
+      await wait(200);
+      if(nxStation) blinkStation(nxStation,'blink-purple');
+      punchCount(nextIdx, n, col);
+      floatNumber(nxStation, '+'+n, col);
+      updateStationCount(nextIdx, nextP.cubes);
       await wait(400);
 
-    } else if (face === FACE.DUMP) {
-      setStatus('🫳 Not my problem! Sliding to '+nextP.name+'!');
-      p.cubes--; nextP.cubes++; G.stats.totalDumped++;
-      playSound('dump');
-      card.classList.remove('resolving');
-      // Fly to next station
-      if(nxStation){
-        const cRect=card.getBoundingClientRect();
-        const sRect=nxStation.getBoundingClientRect();
-        const dx=sRect.left+sRect.width/2-cRect.left-cRect.width/2;
-        const dy=sRect.top+sRect.height/2-cRect.top-cRect.height/2;
-        card.classList.add('resolved-fly');
-        card.style.zIndex='20';
-        card.animate([
-          {transform:'translate(0,0) scale(1)',opacity:1},
-          {transform:'translate('+dx+'px,'+dy+'px) scale(0.3)',opacity:0}
-        ],{duration:500,easing:'ease-in',fill:'forwards'});
-        await wait(350);
-        blinkStation(nxStation,'blink-purple');
-      } else {
-        card.classList.add('resolved');
-      }
-      updateStationCount(G.currentIndex, p.cubes);
-      updateStationCount(nextIdx, nextP.cubes);
-      await wait(250);
-
-    } else if (face === FACE.TICKET) {
-      setStatus('📋 Still cooking... stays at your station');
+    } else if (faceType === FACE.TICKET) {
+      // Tickets fade — nothing leaves or arrives
       playSound('flip');
-      card.classList.remove('resolving');
-      card.classList.add('resolved');
-      if(curStation){blinkStation(curStation,'blink-gold');}
-      await wait(250);
+      cards.forEach(c=>{c.classList.remove('resolving');c.classList.add('resolved');});
+      if(curStation) blinkStation(curStation,'blink-gold');
+      await wait(400);
 
-    } else if (face === FACE.COOKOFF) {
-      setStatus('🔥 Cook-Off card! Stays on the table!','status-cookoff');
-      p.cubes--;
+    } else if (faceType === FACE.COOKOFF) {
+      p.cubes -= n;
       playSound('cookoff');
-      card.classList.remove('resolving');
-      // Cook-off cards stay visible and glowing
-      card.style.transform='scale(1.1)';
-      card.style.boxShadow='0 0 20px rgba(239,68,68,.6),0 0 40px rgba(239,68,68,.3)';
-      card.style.zIndex='15';
+      cards.forEach(c=>{
+        c.classList.remove('resolving');
+        c.style.transform='scale(1.12)';
+        c.style.boxShadow='0 0 20px rgba(239,68,68,.6),0 0 40px rgba(239,68,68,.3)';
+        c.style.zIndex='15';
+      });
+      punchCount(G.currentIndex, -n, col);
+      floatNumber(curStation, '-'+n, col);
       updateStationCount(G.currentIndex, p.cubes);
-      await wait(350);
+      await wait(500);
     }
   }
 
   // Remove all non-cookoff cards from area
   cs.forEach(c=>{if(+c.dataset.face!==FACE.COOKOFF)c.remove();});
   await wait(200);
+}
+
+function floatNumber(stationEl, text, color) {
+  if(!stationEl) return;
+  const f = document.createElement('div');
+  f.className = 'station-float';
+  f.style.color = color;
+  f.textContent = text;
+  f.style.left = '50%';f.style.top = '30%';f.style.transform = 'translateX(-50%)';
+  stationEl.appendChild(f);
+  setTimeout(()=>f.remove(), 1500);
+}
+
+function punchCount(idx, delta, color) {
+  const el = document.getElementById('count-'+idx);
+  if(!el) return;
+  el.classList.remove('count-punch','count-shrink');
+  void el.offsetWidth;
+  if(delta < 0) { el.classList.add('count-shrink'); el.style.color = color; }
+  else { el.classList.add('count-punch'); el.style.color = color; }
+  setTimeout(()=>{el.classList.remove('count-punch','count-shrink');el.style.color='';}, 450);
 }
 
 function blinkStation(el, cls) {
@@ -628,9 +685,16 @@ async function doRoll() {
       else if(cr.type==='tie')setStatus('⚡ TIE! '+cr.total+' cards cascade to '+getPlayer(nextPlayerIndex(G.currentIndex)).name+'!','status-cookoff');
       else setStatus('💥 '+getPlayer(cr.winner).name+' wins the Cook-Off! '+getPlayer(cr.loser).name+' eats '+cr.total+' orders!','status-cookoff');
       await showCookoff(cr);
-      // Blink winner green, loser red
-      if(cr.winner!==undefined){const ws=document.getElementById('station-'+cr.winner);if(ws)blinkStation(ws,'blink-green');}
-      if(cr.loser!==undefined){const ls=document.getElementById('station-'+cr.loser);if(ls)blinkStation(ls,'blink-red');}
+      // Blink winner green, loser red with floating numbers
+      if(cr.winner!==undefined){
+        const ws=document.getElementById('station-'+cr.winner);
+        if(ws){blinkStation(ws,'blink-green');floatNumber(ws,'👨‍🍳 WINS','#10B981');}
+      }
+      if(cr.loser!==undefined){
+        const ls=document.getElementById('station-'+cr.loser);
+        if(ls){blinkStation(ls,'blink-red');punchCount(cr.loser,cr.total,'#EF4444');floatNumber(ls,'+'+cr.total,'#EF4444');}
+      }
+      renderStations();await wait(600);
     }
     renderStations();renderPendingIndicator();
     if(p.cubes<=0){p.cubes=0;await wait(500);victory(G.currentIndex);return;}
