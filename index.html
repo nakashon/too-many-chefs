@@ -506,7 +506,7 @@ async function resolveCardsOneByOne(area, results, p, nextP, nextIdx) {
     groups[FACE.PLATE].forEach(c=>c.classList.add('resolving'));
     await wait(400);
     playSound('plate');
-    groups[FACE.PLATE].forEach(c=>{c.classList.remove('resolving');c.classList.add('card-fly-up','resolved-fly');});
+    groups[FACE.PLATE].forEach(c=>{c.classList.remove('resolving');c.classList.add('resolved','resolved-fly');c.style.transition='opacity .4s ease-out, transform .4s ease-out';c.style.opacity='0';c.style.transform='scale(0.5)';});
     await wait(500);
   }
 
