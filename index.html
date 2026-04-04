@@ -124,7 +124,18 @@ body::before {
 @keyframes cardSettle { 0% { transform: translateY(-10px); opacity: 0.5; } 100% { transform: translateY(0); opacity: 1; } }
 .floating-text { position: absolute; font-weight: 700; font-size: 1rem; pointer-events: none; animation: floatTextUp 1.2s ease-out forwards; z-index: 10; }
 @keyframes floatTextUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.2); } }
-.cookoff-card-label { width:100%;text-align:center;font-weight:700;font-size:.85rem;color:var(--red);padding:4px 0;animation:fadeIn .3s ease-out; }
+/* Card resolution highlighting */
+.card-container.resolving { outline:3px solid #fff;outline-offset:2px;z-index:10;transition:outline .2s,transform .2s;transform:scale(1.08); }
+.card-container.resolved { transition:all .5s;opacity:.3;transform:scale(.85); }
+.card-container.resolved-fly { transition:none; }
+.station.blink-green { animation:blinkGreen .4s ease-out; }
+@keyframes blinkGreen { 0%{box-shadow:0 0 0 rgba(16,185,129,0)} 50%{box-shadow:0 0 30px rgba(16,185,129,.7)} 100%{box-shadow:0 0 0 rgba(16,185,129,0)} }
+.station.blink-purple { animation:blinkPurple .4s ease-out; }
+@keyframes blinkPurple { 0%{box-shadow:0 0 0 rgba(168,85,247,0)} 50%{box-shadow:0 0 30px rgba(168,85,247,.7)} 100%{box-shadow:0 0 0 rgba(168,85,247,0)} }
+.station.blink-red { animation:blinkRed .4s ease-out; }
+@keyframes blinkRed { 0%{box-shadow:0 0 0 rgba(239,68,68,0)} 50%{box-shadow:0 0 30px rgba(239,68,68,.7)} 100%{box-shadow:0 0 0 rgba(239,68,68,0)} }
+.station.blink-gold { animation:blinkGold .4s ease-out; }
+@keyframes blinkGold { 0%{box-shadow:0 0 0 rgba(247,201,72,0)} 50%{box-shadow:0 0 30px rgba(247,201,72,.7)} 100%{box-shadow:0 0 0 rgba(247,201,72,0)} }
 .roll-summary { text-align: center; padding: 8px; font-size: 1rem; min-height: 30px; color: var(--text-muted); }
 .roll-summary span { margin: 0 6px; font-weight: 600; }
 .roll-summary .s-ticket { color: #b8a070; }
@@ -443,70 +454,94 @@ async function animateCards(results) {
   return area;
 }
 
-async function animateResolution(area, counts) {
+async function resolveCardsOneByOne(area, results, p, nextP, nextIdx) {
   const cs = [...area.querySelectorAll('.card-container')];
-  const nextIdx = nextPlayerIndex(G.currentIndex);
-  const nextStation = document.getElementById('station-'+nextIdx);
+  const curStation = document.getElementById('station-'+G.currentIndex);
+  const nxStation = document.getElementById('station-'+nextIdx);
 
-  // Plates fly up — served to customers
-  if (counts.plates > 0) {
-    let d=0;
-    cs.filter(c=>+c.dataset.face===FACE.PLATE).forEach(c=>{
-      setTimeout(()=>{
-        c.classList.add('card-fly-up');
-        const ft=document.createElement('div');ft.className='floating-text';ft.style.color='#10B981';ft.textContent='Served!';
-        ft.style.left=c.offsetLeft+'px';ft.style.top=c.offsetTop+'px';area.appendChild(ft);setTimeout(()=>ft.remove(),1200);
-      },d);d+=120;
-    });
-    playSound('plate');await wait(300+d);
-  }
+  // Process sorted: plates first, then dumps, then tickets, then cookoffs last
+  const order = [FACE.PLATE, FACE.DUMP, FACE.TICKET, FACE.COOKOFF];
+  const sorted = cs.slice().sort((a,b)=>order.indexOf(+a.dataset.face)-order.indexOf(+b.dataset.face));
 
-  // Dumps fly to the next chef's station
-  if (counts.dumps > 0 && nextStation) {
-    const stRect = nextStation.getBoundingClientRect();
-    let d=0;
-    cs.filter(c=>+c.dataset.face===FACE.DUMP).forEach(c=>{
-      setTimeout(()=>{
-        const cRect = c.getBoundingClientRect();
-        const dx = stRect.left + stRect.width/2 - cRect.left - cRect.width/2;
-        const dy = stRect.top + stRect.height/2 - cRect.top - cRect.height/2;
-        c.style.zIndex='20';
-        c.animate([
+  for (const card of sorted) {
+    const face = +card.dataset.face;
+    // Highlight this card
+    card.classList.add('resolving');
+    await wait(250);
+
+    if (face === FACE.PLATE) {
+      setStatus('🍽️ Order Ready! Served to the customer!');
+      p.cubes--; G.stats.totalPlated++;
+      playSound('plate');
+      card.classList.remove('resolving');
+      card.classList.add('card-fly-up','resolved-fly');
+      if(curStation){blinkStation(curStation,'blink-green');}
+      updateStationCount(G.currentIndex, p.cubes);
+      await wait(400);
+
+    } else if (face === FACE.DUMP) {
+      setStatus('🫳 Not my problem! Sliding to '+nextP.name+'!');
+      p.cubes--; nextP.cubes++; G.stats.totalDumped++;
+      playSound('dump');
+      card.classList.remove('resolving');
+      // Fly to next station
+      if(nxStation){
+        const cRect=card.getBoundingClientRect();
+        const sRect=nxStation.getBoundingClientRect();
+        const dx=sRect.left+sRect.width/2-cRect.left-cRect.width/2;
+        const dy=sRect.top+sRect.height/2-cRect.top-cRect.height/2;
+        card.classList.add('resolved-fly');
+        card.style.zIndex='20';
+        card.animate([
           {transform:'translate(0,0) scale(1)',opacity:1},
-          {transform:'translate('+dx+'px,'+dy+'px) scale(0.4)',opacity:0.3}
-        ],{duration:600,easing:'ease-in',fill:'forwards'});
-      },d);d+=150;
-    });
-    playSound('dump');await wait(400+d);
-    // Flash the receiving station
-    if(nextStation){nextStation.style.transition='box-shadow .3s';nextStation.style.boxShadow='0 0 25px rgba(168,85,247,.6)';setTimeout(()=>nextStation.style.boxShadow='',800);}
+          {transform:'translate('+dx+'px,'+dy+'px) scale(0.3)',opacity:0}
+        ],{duration:500,easing:'ease-in',fill:'forwards'});
+        await wait(350);
+        blinkStation(nxStation,'blink-purple');
+      } else {
+        card.classList.add('resolved');
+      }
+      updateStationCount(G.currentIndex, p.cubes);
+      updateStationCount(nextIdx, nextP.cubes);
+      await wait(250);
+
+    } else if (face === FACE.TICKET) {
+      setStatus('📋 Still cooking... stays at your station');
+      playSound('flip');
+      card.classList.remove('resolving');
+      card.classList.add('resolved');
+      if(curStation){blinkStation(curStation,'blink-gold');}
+      await wait(250);
+
+    } else if (face === FACE.COOKOFF) {
+      setStatus('🔥 Cook-Off card! Stays on the table!','status-cookoff');
+      p.cubes--;
+      playSound('cookoff');
+      card.classList.remove('resolving');
+      // Cook-off cards stay visible and glowing
+      card.style.transform='scale(1.1)';
+      card.style.boxShadow='0 0 20px rgba(239,68,68,.6),0 0 40px rgba(239,68,68,.3)';
+      card.style.zIndex='15';
+      updateStationCount(G.currentIndex, p.cubes);
+      await wait(350);
+    }
   }
 
-  // Cook-off cards gather to center with fire glow
-  if (counts.cookoffs > 0) {
-    const cookoffCards = cs.filter(c=>+c.dataset.face===FACE.COOKOFF);
-    cookoffCards.forEach((c,i)=>{
-      c.style.transition='transform .4s ease, box-shadow .4s ease';
-      c.style.transform='scale(1.15)';
-      c.style.boxShadow='0 0 20px rgba(239,68,68,.6), 0 0 40px rgba(239,68,68,.3)';
-      c.style.zIndex='15';
-    });
-    // Add a label above the cookoff cards
-    const label = document.createElement('div');
-    label.className='cookoff-card-label';
-    label.innerHTML = G.pendingMatch && G.pendingMatch.challengerIndex!==G.currentIndex
-      ? '⚔️ Answering the challenge!'
-      : '🔥 Challenging next chef!';
-    // Insert label before the first cookoff card
-    if(cookoffCards.length>0) cookoffCards[0].parentNode.insertBefore(label, cookoffCards[0]);
-    playSound('cookoff');await wait(500);
-  }
+  // Remove all non-cookoff cards from area
+  cs.forEach(c=>{if(+c.dataset.face!==FACE.COOKOFF)c.remove();});
+  await wait(200);
+}
 
-  // Tickets just fade slightly — they stay
-  cs.filter(c=>+c.dataset.face===FACE.TICKET).forEach(c=>{
-    c.style.transition='opacity .3s';c.style.opacity='0.5';
-  });
-  await wait(300);
+function blinkStation(el, cls) {
+  el.classList.remove(cls);
+  void el.offsetWidth; // force reflow
+  el.classList.add(cls);
+  setTimeout(()=>el.classList.remove(cls),500);
+}
+
+function updateStationCount(idx, count) {
+  const el = document.getElementById('count-'+idx);
+  if(el) el.innerHTML = count+'<small> card'+(count!==1?'s':'')+'</small>';
 }
 
 function showRollSummary(counts) {
@@ -566,14 +601,16 @@ async function doRoll() {
     const results=rollCards(p.cubes);const counts=countFaces(results);
     setStatus('🃏 '+p.name+' draws '+p.cubes+' card'+(p.cubes>1?'s':'')+'!');
     const area=await animateCards(results);showRollSummary(counts);await wait(300);
-    await animateResolution(area,counts);await wait(200);
 
-    // Build single summary status
+    // Resolve each card one by one with animations
+    await resolveCardsOneByOne(area, results, p, nextP, nextIdx);
+
+    // Summary status
     const parts=[];
-    if(counts.plates>0){p.cubes-=counts.plates;G.stats.totalPlated+=counts.plates;parts.push('🍽️ '+counts.plates+' served');flashStation(G.currentIndex,'#10B981','-'+counts.plates);}
-    if(counts.dumps>0){p.cubes-=counts.dumps;nextP.cubes+=counts.dumps;G.stats.totalDumped+=counts.dumps;parts.push('🫳 '+counts.dumps+' dumped on '+nextP.name);flashStation(G.currentIndex,'#A855F7','-'+counts.dumps);flashStation(nextIdx,'#A855F7','+'+counts.dumps);}
-    if(counts.tickets>0)parts.push('📋 '+counts.tickets+' still cooking');
-    if(counts.cookoffs>0){p.cubes-=counts.cookoffs;parts.push('🔥 '+counts.cookoffs+' cook-off!');}
+    if(counts.plates>0)parts.push('🍽️ '+counts.plates+' served');
+    if(counts.dumps>0)parts.push('🫳 '+counts.dumps+' to '+nextP.name);
+    if(counts.tickets>0)parts.push('📋 '+counts.tickets+' cooking');
+    if(counts.cookoffs>0)parts.push('🔥 '+counts.cookoffs+' cook-off');
     setStatus(p.name+': '+parts.join(' · '));
     renderStations();await wait(300);
 
@@ -591,7 +628,9 @@ async function doRoll() {
       else if(cr.type==='tie')setStatus('⚡ TIE! '+cr.total+' cards cascade to '+getPlayer(nextPlayerIndex(G.currentIndex)).name+'!','status-cookoff');
       else setStatus('💥 '+getPlayer(cr.winner).name+' wins the Cook-Off! '+getPlayer(cr.loser).name+' eats '+cr.total+' orders!','status-cookoff');
       await showCookoff(cr);
-      if(cr.loser!==undefined)flashStation(cr.loser,'#EF4444','+'+cr.total);
+      // Blink winner green, loser red
+      if(cr.winner!==undefined){const ws=document.getElementById('station-'+cr.winner);if(ws)blinkStation(ws,'blink-green');}
+      if(cr.loser!==undefined){const ls=document.getElementById('station-'+cr.loser);if(ls)blinkStation(ls,'blink-red');}
     }
     renderStations();renderPendingIndicator();
     if(p.cubes<=0){p.cubes=0;await wait(500);victory(G.currentIndex);return;}
