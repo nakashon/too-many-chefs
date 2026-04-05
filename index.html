@@ -132,6 +132,7 @@ body::before {
 .card-dump .card-front { background: linear-gradient(135deg, #7C3AED, #A855F7); border: 2px solid #c084fc; color: white; }
 .card-dump .card-inner.flipped { transform: rotateY(180deg) rotate(-3deg); }
 .card-cookoff .card-front { background: linear-gradient(135deg, #DC2626, #F97316); border: 2px solid #fbbf24; color: white; animation: cookoffGlow 1.5s ease-in-out infinite; }
+.card-sendback .card-label { font-size: 0.7rem; font-weight: 700; }
 .card-sendback .card-front { background: linear-gradient(135deg, #D97706, #F59E0B); border: 2px solid #fbbf24; color: white; animation: sendbackShake 0.5s ease-in-out; }
 @keyframes sendbackShake { 0%,100%{transform:rotateY(180deg) rotate(0)} 25%{transform:rotateY(180deg) rotate(-5deg)} 75%{transform:rotateY(180deg) rotate(5deg)} }
 .card-sendback-drop { animation: cardDropIn 0.5s ease-out both; }
@@ -1047,6 +1048,9 @@ function rollSendBackCount() {
   return 3;
 }
 
+const COMPLAINTS={en:['Cold!','Salty!','Yuck!','Spicy!','Weird!','Raw!','Burnt!'],he:['קר!','מלוח!','איכס!','חריף!','מוזר!','נא!','שרוף!']};
+function randComplaint(){return pick(COMPLAINTS[currentLang]);}
+
 async function animateSendBack(count, p) {
   if (count === 0) return;
   const area = $('card-area');
@@ -1060,7 +1064,7 @@ async function animateSendBack(count, p) {
     const el = document.createElement('div');
     el.className = 'card-container card-sendback card-sendback-drop';
     el.style.animationDelay = (i * 0.15) + 's';
-    el.innerHTML = '<div class="card-inner flipped"><div class="card-face card-back">' + CARD_SVG.back + '</div><div class="card-face card-front"><div class="card-svg">' + CARD_SVG.sendback + '</div><div class="card-label">' + f.label + '</div></div></div>';
+    el.innerHTML = '<div class="card-inner flipped"><div class="card-face card-back">' + CARD_SVG.back + '</div><div class="card-face card-front"><div class="card-svg">' + CARD_SVG.sendback + '</div><div class="card-label">' + randComplaint() + '</div></div></div>';
     area.appendChild(el);
     if (i === 0) showCardTooltip(el, FACE.SENDBACK);
     await wait(200);
