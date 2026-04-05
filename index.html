@@ -184,6 +184,12 @@ body::before {
 .cookoff-side.loser-side { opacity:.5;transform:scale(.9); }
 .cookoff-vs { font-size:1.8rem;font-weight:700;color:var(--red);text-shadow:0 0 20px rgba(230,57,70,.5); }
 .cookoff-result { margin-top:12px;font-size:1.05rem;font-weight:600;text-align:center;animation:fadeIn .5s ease-out; }
+.cookoff-line { display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:12px;animation:fadeIn .4s ease-out; }
+.co-name { font-weight:600;font-size:1.1rem;white-space:nowrap; }
+.co-vs { font-weight:700;color:var(--red);font-size:1.3rem;margin:0 4px; }
+.co-arrow { font-size:1.3rem;margin:0 4px; }
+.co-pending { font-size:1.8rem;color:var(--text-muted);animation:pendingPulse 1.5s ease-in-out infinite; }
+.co-result-line { text-align:center;font-size:1.15rem;font-weight:600;padding:8px;animation:fadeIn .4s ease-out;margin-top:8px; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)} }
 
 /* Narrator */
@@ -1115,58 +1121,41 @@ function makeCookoffCards(count,faceDown){
 
 async function showCookoff(data) {
   const area=$('card-area');playSound('clash');
-  // Update spotlight labels without moving players
-  const activeLabel=document.querySelector('.spot-active .spot-label');
-  const nextLabel=document.querySelector('.spot-next .spot-label');
-  const savedLabels={a:activeLabel?activeLabel.textContent:'',n:nextLabel?nextLabel.textContent:''};
   if(data.type==='new_challenge'){
-    const ch=getPlayer(data.challenger);const np=getPlayer(nextPlayerIndex(data.challenger));
-    if(activeLabel)activeLabel.textContent=currentLang==='he'?'🔥 מאתגר':'🔥 CHALLENGER';
-    if(nextLabel)nextLabel.textContent=currentLang==='he'?'🛡️ מאותגר':'🛡️ DEFENDER';
-    area.innerHTML='<div class="cookoff-box"><div class="cookoff-title">'+t('challengeTitle')+'</div><div class="cookoff-versus"><div class="cookoff-side"><div class="side-name" style="color:'+ch.color+'">'+ch.name+'</div><div class="side-cards">'+makeCookoffCards(data.count,false)+'</div></div><div class="cookoff-vs">'+(currentLang==='he'?'⬅':'➡')+'</div><div class="cookoff-side"><div class="side-name" style="color:'+np.color+'">'+np.name+'</div><div class="side-cards">'+makeCookoffCards(data.count,true)+'</div></div></div><div class="cookoff-result">'+ts('throwsDown',{name:ch.name,n:data.count,s:data.count>1?'s':''})+'</div></div>';
-    await wait(2500);
-    if(activeLabel)activeLabel.textContent=savedLabels.a;if(nextLabel)nextLabel.textContent=savedLabels.n;
-    return;
+    const ch=getPlayer(data.challenger);
+    // Simple: show challenger's cards in a line with their name
+    area.innerHTML='<div class="cookoff-line"><span class="co-name" style="color:'+ch.color+'">'+(ch.avatar||'🧑‍🍳')+' '+ch.name+'</span>'+makeCookoffCards(data.count,false)+'<span class="co-arrow">'+(currentLang==='he'?'⬅':'➡')+'</span><span class="co-pending">?</span></div>';
+    await wait(1500);return;
   }
-  // Resolution: current player is defender, challenger from pendingMatch
+  // Resolution: show both sides on one line
   const defender=currentPlayer();
   const chalIdx=data.type==='defender_wins'?data.loser:data.winner;
   const challenger=getPlayer(chalIdx);
-  if(activeLabel)activeLabel.textContent=currentLang==='he'?'🛡️ מאותגר':'🛡️ DEFENDER';
-  if(nextLabel)nextLabel.textContent=currentLang==='he'?'🔥 מאתגר':'🔥 CHALLENGER';
-
-  area.innerHTML='<div class="cookoff-box"><div class="cookoff-title">'+t('cookoffTitle')+'</div><div class="cookoff-versus"><div class="cookoff-side" id="co-left"><div class="side-name" style="color:'+challenger.color+'">'+challenger.name+'</div><div class="side-cards">'+makeCookoffCards(data.challengerCount,false)+'</div></div><div class="cookoff-vs">'+t('vs')+'</div><div class="cookoff-side" id="co-right"><div class="side-name" style="color:'+defender.color+'">'+defender.name+'</div><div class="side-cards" id="co-right-cards">'+makeCookoffCards(data.defenderCount,true)+'</div></div></div><div class="cookoff-result" id="co-result" style="opacity:0;"></div></div>';
-  playSound('cookoff');await wait(1200);
-  // Flip defender cards one by one
-  const rc=area.querySelector('#co-right-cards');
-  if(rc){const fd=rc.querySelectorAll('.face-down');const si=CARD_SVG.cookoff.replace(/<\/?svg[^>]*>/g,'');for(let i=0;i<fd.length;i++){await wait(300);fd[i].classList.remove('face-down');fd[i].style.background='linear-gradient(135deg,#DC2626,#F97316)';fd[i].style.border='2px solid #fbbf24';fd[i].innerHTML='<svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">'+si+'</svg>';playSound('flip');}}
-  await wait(600);
-  // Show winner/loser
+  area.innerHTML='<div class="cookoff-line"><span class="co-name" style="color:'+challenger.color+'">'+(challenger.avatar||'🧑‍🍳')+' '+challenger.name+'</span>'+makeCookoffCards(data.challengerCount,false)+'<span class="co-vs">'+t('vs')+'</span>'+makeCookoffCards(data.defenderCount,true)+'<span class="co-name" style="color:'+defender.color+'">'+(defender.avatar||'🧑‍🍳')+' '+defender.name+'</span></div>';
+  playSound('cookoff');await wait(800);
+  // Flip defender cards
+  const fd=area.querySelectorAll('.face-down');const si=CARD_SVG.cookoff.replace(/<\/?svg[^>]*>/g,'');
+  for(let i=0;i<fd.length;i++){await wait(300);fd[i].classList.remove('face-down');fd[i].style.background='linear-gradient(135deg,#DC2626,#F97316)';fd[i].style.border='2px solid #fbbf24';fd[i].innerHTML='<svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">'+si+'</svg>';playSound('flip');}
+  await wait(500);
+  // Show result inline
   const winner=getPlayer(data.winner);const loser=getPlayer(data.loser);
-  const le=area.querySelector('#co-left');const re=area.querySelector('#co-right');
-  if(data.winner===chalIdx){le.classList.add('winner-side');re.classList.add('loser-side');}else{re.classList.add('winner-side');le.classList.add('loser-side');}
-  const res=area.querySelector('#co-result');res.style.opacity='1';res.innerHTML=ts('cookoffResult',{winner:winner.name,loser:loser.name,n:data.total});
-  playSound('win');await wait(1200);
-  // Fly cards to loser's station
+  const resultDiv=document.createElement('div');resultDiv.className='co-result-line';
+  resultDiv.innerHTML='<span style="color:'+winner.color+'">'+(winner.avatar||'🧑‍🍳')+' '+winner.name+'</span> 🏆 → <span style="color:'+loser.color+'">'+loser.name+' +'+data.total+'</span>';
+  area.appendChild(resultDiv);
+  playSound('win');await wait(1000);
+  // Fly cards to loser
   const loserStation=document.getElementById('spot-'+data.loser) || document.getElementById('station-'+data.loser);
   if(loserStation){
     const allCards=[...area.querySelectorAll('.co-card')];
     for(let i=0;i<allCards.length;i++){
       const card=allCards[i];
       const cR=card.getBoundingClientRect(),sR=loserStation.getBoundingClientRect();
-      const dx=sR.left+sR.width/2-cR.left-cR.width/2;
-      const dy=sR.top+sR.height/2-cR.top-cR.height/2;
       card.style.position='relative';card.style.zIndex='30';
-      card.animate([
-        {transform:'translate(0,0) scale(1)',opacity:1},
-        {transform:'translate('+dx+'px,'+dy+'px) scale(0.4)',opacity:0}
-      ],{duration:400,easing:'ease-in',fill:'forwards'});
-      await wait(100);
+      card.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:'translate('+(sR.left+sR.width/2-cR.left-cR.width/2)+'px,'+(sR.top+sR.height/2-cR.top-cR.height/2)+'px) scale(0.4)',opacity:0}],{duration:400,easing:'ease-in',fill:'forwards'});
+      await wait(80);
     }
-    await wait(500);
-  } else { await wait(1600); }
-  // Restore labels
-  if(activeLabel)activeLabel.textContent=savedLabels.a;if(nextLabel)nextLabel.textContent=savedLabels.n;
+    await wait(400);
+  } else { await wait(800); }
 }
 
 function beginTurn() {
@@ -1227,7 +1216,7 @@ async function doRoll() {
       await wait(1200);
     }
     renderStations();renderPendingIndicator();
-    if(p.cubes<=0){p.cubes=0;await wait(500);victory(G.currentIndex);return;}
+    if(p.cubes<=0&&!G.pendingMatch){p.cubes=0;await wait(500);victory(G.currentIndex);return;}
   } catch(err) {
     console.error('doRoll error:',err);
     setStatus(t('error'));
