@@ -263,18 +263,110 @@ body::before {
 .kitchen-area { background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0px,rgba(255,255,255,.02) 1px,transparent 1px,transparent 10px),repeating-linear-gradient(-45deg,rgba(255,255,255,.02) 0px,rgba(255,255,255,.02) 1px,transparent 1px,transparent 10px); }
 
 @media (max-width: 600px) {
+  /* Layout & screens */
+  .screen { padding: 12px 8px; }
+  .kitchen-area { padding: 12px 8px; min-height: 180px; border-radius: 14px; }
+
+  /* Buttons */
+  .btn { padding: 10px 20px; font-size: 1rem; width: 100%; box-sizing: border-box; }
+  .btn-roll { padding: 12px 32px; font-size: 1.2rem; width: auto; }
+
+  /* Turn banner */
+  .turn-banner { padding: 8px 14px; font-size: clamp(1rem, 3.5vw, 1.4rem); border-radius: 12px; }
+
+  /* Narrator */
+  .narrator { padding: 10px 14px; font-size: 1rem; min-height: 44px; border-radius: 10px; }
+
+  /* Stations */
   .station { min-width: 90px; padding: 10px 10px; }
   .station-count { font-size: 1.3rem; }
+
+  /* Cards */
   .card-container { width: 60px; height: 84px; }
   .card-front .card-svg { width: 30px; height: 30px; }
   .card-front .card-label { font-size: 0.45rem; }
-  .cookoff-side { min-width: 130px; padding: 14px 16px; }
+
+  /* Setup screen */
+  .title-rules { grid-template-columns: 1fr; max-width: 100%; gap: 8px; margin-bottom: 20px; }
+  .rule-card { padding: 10px 12px; gap: 8px; }
+  .rule-card .rule-mini-card { width: 40px; height: 54px; }
+  .rule-card .rule-text { font-size: 0.8rem; }
+  .player-configs { max-width: 100%; }
+  .player-row { padding: 6px 10px; gap: 6px; }
+  .player-row .chef-hat { font-size: 1.2rem; }
+  .player-row input { font-size: 0.85rem; padding: 5px 8px; }
+
+  /* Scoreboard strip */
+  .scoreboard-strip { gap: 4px; }
+  .sb-chip { padding: 4px 8px; font-size: 0.72rem; gap: 4px; }
+  .sb-chip .sb-avatar { font-size: 0.95rem; }
+  .sb-chip .sb-count { font-size: 0.85rem; }
+
+  /* Spotlight row */
+  .spotlight-row { flex-direction: column; gap: 8px; }
+  .spot-station { max-width: 100%; padding: 10px 12px; min-height: 70px; border-radius: 12px; }
+
+  /* Cook-off zone */
+  .cz-row { flex-wrap: wrap; gap: 6px; padding: 8px; }
+  .cookoff-side { min-width: 110px; padding: 10px 12px; border-radius: 10px; }
+  .cookoff-side .side-name { font-size: 0.9rem; }
   .cookoff-side .side-cards .co-card { width: 36px; height: 50px; }
-  .title-rules { grid-template-columns: 1fr; }
-  .narrator { font-size: 0.9rem; }
-  .spotlight-row { flex-direction:column;gap:8px; }
-  .spot-station { max-width:100%; }
-  .cz-row { flex-wrap:wrap; }
+  #cookoff-zone { max-width: 100%; }
+
+  /* Victory screen */
+  .victory-title { font-size: clamp(1.6rem, 6vw, 2.5rem); }
+  .victory-subtitle { font-size: 1rem; }
+  .victory-stats { gap: 10px; }
+  .stat-card { padding: 8px 12px; border-radius: 10px; }
+  .stat-card .stat-val { font-size: 1.4rem; }
+  .stat-card .stat-label { font-size: 0.7rem; }
+
+  /* Language toggle */
+  .lang-toggle { top: 6px; right: 6px; padding: 3px; }
+  .lang-btn { padding: 4px 10px; font-size: 0.75rem; }
+}
+
+@media (max-width: 380px) {
+  .screen { padding: 8px 4px; }
+  .kitchen-area { padding: 8px 4px; min-height: 140px; }
+
+  .btn { padding: 8px 14px; font-size: 0.9rem; }
+  .btn-roll { padding: 10px 24px; font-size: 1.05rem; }
+
+  .turn-banner { padding: 6px 10px; font-size: clamp(0.85rem, 3vw, 1.1rem); }
+  .narrator { padding: 8px 10px; font-size: 0.85rem; min-height: 38px; }
+
+  .station { min-width: 76px; padding: 8px 6px; border-radius: 10px; }
+  .station-count { font-size: 1.1rem; }
+  .card-container { width: 50px; height: 70px; }
+  .card-front .card-svg { width: 24px; height: 24px; }
+  .card-front .card-label { font-size: 0.4rem; }
+
+  .title-rules { gap: 6px; margin-bottom: 14px; }
+  .rule-card { padding: 8px 8px; gap: 6px; }
+  .rule-card .rule-mini-card { width: 34px; height: 46px; }
+  .rule-card .rule-mini-card svg { width: 24px; height: 24px; }
+  .rule-card .rule-text { font-size: 0.72rem; }
+  .player-row input { min-width: 60px; }
+
+  .sb-chip { padding: 3px 6px; font-size: 0.65rem; }
+  .sb-chip .sb-count { font-size: 0.75rem; }
+
+  .spot-station { padding: 8px 8px; min-height: 60px; }
+  .cookoff-side { min-width: 90px; padding: 8px 8px; }
+  .cookoff-side .side-name { font-size: 0.8rem; }
+  .cookoff-side .side-cards .co-card { width: 30px; height: 42px; }
+  .cookoff-side .side-cards .co-card svg { width: 18px; height: 18px; }
+  .cz-row { gap: 4px; padding: 6px; }
+
+  .victory-title { font-size: clamp(1.3rem, 5vw, 2rem); }
+  .victory-subtitle { font-size: 0.85rem; }
+  .stat-card { padding: 6px 8px; }
+  .stat-card .stat-val { font-size: 1.15rem; }
+  .stat-card .stat-label { font-size: 0.65rem; }
+
+  .lang-toggle { top: 4px; right: 4px; }
+  .lang-btn { padding: 3px 7px; font-size: 0.7rem; }
 }
 .lang-toggle { position:fixed;top:12px;right:12px;z-index:100;display:flex;gap:4px;background:rgba(0,0,0,.5);border-radius:20px;padding:4px;backdrop-filter:blur(8px); }
 .lang-btn { padding:6px 14px;border-radius:16px;border:none;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--text-muted);font-family:'Fredoka',sans-serif; }
