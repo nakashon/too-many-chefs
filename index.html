@@ -1057,7 +1057,7 @@ async function doRoll() {
     let cr=null;
     if(G.pendingMatch){
       const pm=G.pendingMatch;const total=pm.count+counts.cookoffs;
-      if(counts.cookoffs>pm.count){const ch=getPlayer(pm.challengerIndex);if(ch.cubes>0)ch.cubes+=total;cr={type:'defender_wins',winner:G.currentIndex,loser:pm.challengerIndex,total,defenderCount:counts.cookoffs,challengerCount:pm.count};}
+      if(counts.cookoffs>=pm.count){const ch=getPlayer(pm.challengerIndex);if(ch.cubes>0)ch.cubes+=total;cr={type:'defender_wins',winner:G.currentIndex,loser:pm.challengerIndex,total,defenderCount:counts.cookoffs,challengerCount:pm.count};}
       else{p.cubes+=total;cr={type:'defender_loses',winner:pm.challengerIndex,loser:G.currentIndex,total,defenderCount:counts.cookoffs,challengerCount:pm.count};}
       G.pendingMatch=null;
       G.stats.totalCookoffs++;
