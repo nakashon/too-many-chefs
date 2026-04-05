@@ -389,9 +389,10 @@ html[dir="rtl"] .station.active::after { right:auto;left:8px; }
 html[dir="rtl"] .player-row { border-left:none;border-right:4px solid var(--orange); }
 /* Scoreboard strip + Spotlight */
 .scoreboard-strip { display:flex;gap:8px;justify-content:center;flex-wrap:wrap;width:100%;max-width:900px; }
-.sb-chip { display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;background:rgba(255,255,255,0.06);backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,.08);font-size:.8rem;transition:all .3s; }
-.sb-chip .sb-avatar { font-size:1.1rem; }
-.sb-chip .sb-count { font-weight:700;font-size:1rem; }
+.sb-chip { display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;background:rgba(255,255,255,0.06);backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,.08);font-size:.8rem;transition:all .3s;overflow:hidden; }
+.sb-chip .sb-avatar { font-size:1.1rem;flex-shrink:0; }
+.sb-chip .sb-name { white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1; }
+.sb-chip .sb-count { font-weight:700;font-size:1rem;flex-shrink:0; }
 .sb-chip.sb-active { border-color:var(--golden);background:rgba(247,201,72,.1); }
 .sb-chip.sb-next { border-color:var(--teal);background:rgba(78,205,196,.1); }
 .spotlight-row { display:flex;gap:16px;justify-content:center;width:100%;max-width:900px;align-items:stretch; }
@@ -954,7 +955,7 @@ function renderStations() {
     const chip = document.createElement('div');
     chip.className = 'sb-chip' + (i === G.currentIndex ? ' sb-active' : '') + (i === nextIdx ? ' sb-next' : '');
     chip.id = 'station-' + i;
-    chip.innerHTML = '<span class="sb-avatar">' + (p.avatar || '🧑‍🍳') + '</span><span style="color:' + p.color + '">' + p.name + '</span><span class="sb-count" id="count-' + i + '">' + p.cubes + '</span>';
+    chip.innerHTML = '<span class="sb-avatar">' + (p.avatar || '🧑‍🍳') + '</span><span class="sb-name" style="color:' + p.color + '">' + p.name + '</span><span class="sb-count" id="count-' + i + '">' + p.cubes + '</span>';
     if (p.cubes === 0) chip.style.opacity = '.5';
     strip.appendChild(chip);
   });
