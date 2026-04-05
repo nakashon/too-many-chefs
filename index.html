@@ -327,13 +327,22 @@ const FACE_DATA = [
 ];
 const PLAYER_COLORS = ['#FF6B35','#4ECDC4','#E63946','#7209B7','#06D6A0','#F472B6'];
 const CHEF_AVATARS = ['👨‍🍳','👩‍🍳','🧑‍🍳','🤠','🦊','🐻','🐧','🐱','🦁','🐸','👾','🤖'];
-const AI_CHEFS = [
-  { name: 'Bot-ardee',     quip: 'Mama mia!' },
-  { name: 'Gordon RAMsey', quip: "IT'S RAW!" },
-  { name: 'Sous-Vide Bot', quip: 'Precisely calculated.' },
-  { name: 'Chef Algo',     quip: 'Optimizing flavor...' },
-  { name: 'Wok-Bot',       quip: 'Wok and roll, baby!' },
-];
+const AI_CHEFS = {
+  en: [
+    { name: 'Bot-ardee',     quip: 'Mama mia!' },
+    { name: 'Gordon RAMsey', quip: "IT'S RAW!" },
+    { name: 'Sous-Vide Bot', quip: 'Precisely calculated.' },
+    { name: 'Chef Algo',     quip: 'Optimizing flavor...' },
+    { name: 'Wok-Bot',       quip: 'Wok and roll, baby!' },
+  ],
+  he: [
+    { name: 'בוט-ארדי',      quip: '!מאמא מיה' },
+    { name: 'גורדון ראם-זי',  quip: '!זה נא' },
+    { name: 'סו-ויד בוט',    quip: '.מחושב בדיוק' },
+    { name: 'שף אלגו',       quip: '...ממקסם טעמים' },
+    { name: 'ווק-בוט',       quip: '!ווק אנד רול, חביבי' },
+  ]
+};
 const STARTING_CUBES = 10;
 const FOOD_EMOJIS = ['🍕','🌮','🍔','🍩','🧁','🥐','🍣','🍗','🥞','🧀','🌶️','🍟','🥚','🍰','🫕'];
 const FUNNY_DUMPS = [
@@ -614,7 +623,7 @@ function initSetup() {
   const sel=$('count-selector'); sel.innerHTML='';
   for(let i=2;i<=6;i++){const b=document.createElement('button');b.className='count-btn'+(i===selectedCount?' selected':'');b.textContent=i;b.onclick=()=>{selectedCount=i;initSetup();};sel.appendChild(b);}
   const cfg=$('player-configs'); cfg.innerHTML='';
-  const shuffledAI=[...AI_CHEFS].sort(()=>Math.random()-0.5);
+  const shuffledAI=[...AI_CHEFS[currentLang]].sort(()=>Math.random()-0.5);
   for(let i=0;i<selectedCount;i++){
     const row=document.createElement('div');row.className='player-row';row.style.borderLeftColor=PLAYER_COLORS[i];row.style.animationDelay=(i*0.08)+'s';
     const isFirst=i===0;const aiName=shuffledAI[i%shuffledAI.length].name;
@@ -640,7 +649,7 @@ function startGame() {
   const players=[];
   for(let i=0;i<selectedCount;i++){
     const nameEl=$('pname-'+i);const aiEl=$('pai-'+i);
-    const name=(nameEl.value.trim()||('Chef '+(i+1)));
+    const name=(nameEl.value.trim()||(t('chef')+' '+(i+1)));
     const avatarEl=$('pavatar-'+i);const avatar=avatarEl?avatarEl.value:(i===0?CHEF_AVATARS[0]:CHEF_AVATARS[11]);
     players.push({name,index:i,cubes:STARTING_CUBES,isAI:i===0?false:(aiEl?aiEl.checked:true),color:PLAYER_COLORS[i],avatar});
   }
