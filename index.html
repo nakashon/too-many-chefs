@@ -47,7 +47,7 @@ body::before {
 .title-sub { font-size: clamp(1rem, 3vw, 1.5rem); color: var(--golden); font-weight: 500; margin-bottom: 30px; text-align: center; }
 .title-lore { max-width: 600px; text-align: center; font-family: 'Patrick Hand', cursive; font-size: 1.15rem; line-height: 1.6; color: var(--text-muted); margin-bottom: 10px; background: rgba(0,0,0,0.3); border-radius: 16px; padding: 20px 28px; border: 1px solid rgba(255,255,255,0.05); }
 .title-goal { font-size: 1.2rem; color: var(--golden); margin-bottom: 40px; text-align: center; }
-.title-rules { max-width: 680px; margin-bottom: 36px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.title-rules { max-width: 680px; margin-bottom: 36px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 .rule-card { background: rgba(0,0,0,0.35); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.06); }
 .rule-card .rule-mini-card { width: 48px; height: 66px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
 .rule-card .rule-mini-card svg { width: 32px; height: 32px; }
@@ -308,9 +308,9 @@ html[dir="rtl"] .player-row { border-left:none;border-right:4px solid var(--oran
 <!-- VICTORY SCREEN -->
 <div id="screen-victory" class="screen">
   <div class="confetti-container" id="confetti-container"></div>
-  <div class="victory-title">🏆 GOLDEN LADLE WINNER! 🏆</div>
+  <div class="victory-title" id="victory-title"></div>
   <div class="winner-display" id="winner-display"></div>
-  <div class="victory-subtitle">First to clear the station!</div>
+  <div class="victory-subtitle" id="victory-subtitle"></div>
   <div class="victory-stats" id="victory-stats"></div>
   <button class="btn btn-primary" onclick="showScreen('setup')">COOK AGAIN! 🍳</button>
 </div>
@@ -831,7 +831,7 @@ async function resolveCardsOneByOne(area, results, p, nextP, nextIdx) {
       await wait(120);
     }
     nextP.cubes += n;
-    renderStations();
+    updateStationCount(nextIdx, nextP.cubes);
     const nxS2 = document.getElementById('spot-'+nextIdx) || document.getElementById('station-'+nextIdx);
     if(nxS2) blinkStation(nxS2,'blink-purple');
     floatNumber(nxS2, '+'+n, '#A855F7');
@@ -929,13 +929,15 @@ function floatNumber(stationEl, text, color) {
 }
 
 function punchCount(idx, delta, color) {
-  const el = document.getElementById('count-'+idx);
-  if(!el) return;
-  el.classList.remove('count-punch','count-shrink');
-  void el.offsetWidth;
-  if(delta < 0) { el.classList.add('count-shrink'); el.style.color = color; }
-  else { el.classList.add('count-punch'); el.style.color = color; }
-  setTimeout(()=>{el.classList.remove('count-punch','count-shrink');el.style.color='';}, 450);
+  ['count-'+idx, 'spot-count-'+idx].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.classList.remove('count-punch','count-shrink');
+    void el.offsetWidth;
+    if(delta < 0) { el.classList.add('count-shrink'); el.style.color = color; }
+    else { el.classList.add('count-punch'); el.style.color = color; }
+    setTimeout(()=>{el.classList.remove('count-punch','count-shrink');el.style.color='';}, 450);
+  });
 }
 
 function blinkStation(el, cls) {
@@ -1101,6 +1103,8 @@ function victory(winnerIndex) {
   G.isFirstGame=false;
   const p=getPlayer(winnerIndex);
   playSound('win');
+  $('victory-title').textContent=t('victoryTitle');
+  $('victory-subtitle').textContent=t('victorySubtitle');
   $('winner-display').innerHTML='<span style="color:'+p.color+'">'+(p.avatar||'🧑‍🍳')+' '+p.name+'</span>';
   $('victory-stats').innerHTML='<div class="stat-card"><div class="stat-val">'+G.stats.turns+'</div><div class="stat-label">'+t('statTurns')+'</div></div><div class="stat-card"><div class="stat-val">'+G.stats.totalPlated+'</div><div class="stat-label">'+t('statPlated')+'</div></div><div class="stat-card"><div class="stat-val">'+G.stats.totalDumped+'</div><div class="stat-label">'+t('statDumped')+'</div></div><div class="stat-card"><div class="stat-val">'+G.stats.totalCookoffs+'</div><div class="stat-label">'+t('statCookoffs')+'</div></div><div class="stat-card"><div class="stat-val">'+G.stats.totalSentBack+'</div><div class="stat-label">'+t('statSentBack')+'</div></div>';
   const cc=$('confetti-container');cc.innerHTML='';
