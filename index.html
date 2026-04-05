@@ -675,8 +675,8 @@ function renderStations() {
   const active = currentPlayer();
   const next = getPlayer(nextIdx);
 
-  function makeSpot(p, idx, type) {
-    const label = type === 'active' ? (currentLang === 'he' ? '🔪 תורך' : '🔪 YOUR TURN') : (currentLang === 'he' ? '⏭️ הבא' : '⏭️ NEXT UP');
+  function makeSpot(p, idx, type, labelOverride) {
+    const label = labelOverride || (type === 'active' ? (currentLang === 'he' ? '🔪 תורך' : '🔪 YOUR TURN') : (currentLang === 'he' ? '⏭️ הבא' : '⏭️ NEXT UP'));
     const pc = Math.min(p.cubes, 8);
     let pile = '';
     for (let j = 0; j < pc; j++) pile += '<div class="pile-card" style="left:' + (j*3) + 'px;transform:rotate(' + ((j - pc/2) * 3) + 'deg);z-index:' + j + ';"></div>';
@@ -684,6 +684,18 @@ function renderStations() {
   }
 
   row.innerHTML = makeSpot(active, G.currentIndex, 'active') + '<div class="spot-vs">⚔️</div>' + makeSpot(next, nextIdx, 'next');
+}
+
+function renderSpotlightPair(leftIdx, rightIdx, leftLabel, rightLabel) {
+  const row = $('spotlight-row');
+  const lp = getPlayer(leftIdx), rp = getPlayer(rightIdx);
+  function makeSpotCustom(p, idx, type, label) {
+    const pc = Math.min(p.cubes, 8);
+    let pile = '';
+    for (let j = 0; j < pc; j++) pile += '<div class="pile-card" style="left:' + (j*3) + 'px;transform:rotate(' + ((j - pc/2) * 3) + 'deg);z-index:' + j + ';"></div>';
+    return '<div class="spot-station spot-' + type + '" style="--c:' + p.color + ';" id="spot-' + idx + '"><div class="spot-label label-' + type + '">' + label + '</div><div class="spot-name"><span style="color:' + p.color + ';font-size:1.6rem;">' + (p.avatar || '🧑‍🍳') + '</span> <span style="color:' + p.color + '">' + p.name + '</span></div><div class="spot-count" id="spot-count-' + idx + '">' + p.cubes + '<small> ' + (p.cubes !== 1 ? t('cards') : t('card')) + '</small></div><div class="spot-pile">' + pile + '</div></div>';
+  }
+  row.innerHTML = makeSpotCustom(lp, leftIdx, 'active', leftLabel) + '<div class="spot-vs">🔥</div>' + makeSpotCustom(rp, rightIdx, 'next', rightLabel);
 }
 
 function flashStation(index, color, text) {
@@ -989,20 +1001,33 @@ async function showCookoff(data) {
   const area=$('card-area');playSound('clash');
   if(data.type==='new_challenge'){
     const ch=getPlayer(data.challenger);const np=getPlayer(nextPlayerIndex(data.challenger));
+    const chalLabel=currentLang==='he'?'🔥 מאתגר':'🔥 CHALLENGER';
+    const defLabel=currentLang==='he'?'🛡️ מאותגר':'🛡️ DEFENDER';
+    renderSpotlightPair(data.challenger, nextPlayerIndex(data.challenger), chalLabel, defLabel);
     area.innerHTML='<div class="cookoff-box"><div class="cookoff-title">'+t('challengeTitle')+'</div><div class="cookoff-versus"><div class="cookoff-side"><div class="side-name" style="color:'+ch.color+'">'+ch.name+'</div><div class="side-cards">'+makeCookoffCards(data.count,false)+'</div></div><div class="cookoff-vs">'+(currentLang==='he'?'⬅':'➡')+'</div><div class="cookoff-side"><div class="side-name" style="color:'+np.color+'">'+np.name+'</div><div class="side-cards">'+makeCookoffCards(data.count,true)+'</div></div></div><div class="cookoff-result">'+ts('throwsDown',{name:ch.name,n:data.count,s:data.count>1?'s':''})+'</div></div>';
     await wait(2500);return;
   }
-  const winner=getPlayer(data.winner);const loser=getPlayer(data.loser);const leftP=data.type==='defender_wins'?loser:winner;
-  area.innerHTML='<div class="cookoff-box"><div class="cookoff-title">'+t('cookoffTitle')+'</div><div class="cookoff-versus"><div class="cookoff-side" id="co-left"><div class="side-name" style="color:'+leftP.color+'">'+leftP.name+'</div><div class="side-cards">'+makeCookoffCards(data.challengerCount,false)+'</div></div><div class="cookoff-vs">'+t('vs')+'</div><div class="cookoff-side" id="co-right"><div class="side-name" style="color:'+currentPlayer().color+'">'+currentPlayer().name+'</div><div class="side-cards" id="co-right-cards">'+makeCookoffCards(data.defenderCount,true)+'</div></div></div><div class="cookoff-result" id="co-result" style="opacity:0;"></div></div>';
+  // Resolution: show challenger (left) vs defender/current (right)
+  const chalIdx=data.type==='defender_wins'?data.loser:data.winner;
+  const defIdx=G.currentIndex;
+  const challenger=getPlayer(chalIdx);const defender=currentPlayer();
+  const chalLabel=currentLang==='he'?'🔥 מאתגר':'🔥 CHALLENGER';
+  const defLabel=currentLang==='he'?'🛡️ מאותגר':'🛡️ DEFENDER';
+  renderSpotlightPair(chalIdx, defIdx, chalLabel, defLabel);
+
+  area.innerHTML='<div class="cookoff-box"><div class="cookoff-title">'+t('cookoffTitle')+'</div><div class="cookoff-versus"><div class="cookoff-side" id="co-left"><div class="side-name" style="color:'+challenger.color+'">'+challenger.name+'</div><div class="side-cards">'+makeCookoffCards(data.challengerCount,false)+'</div></div><div class="cookoff-vs">'+t('vs')+'</div><div class="cookoff-side" id="co-right"><div class="side-name" style="color:'+defender.color+'">'+defender.name+'</div><div class="side-cards" id="co-right-cards">'+makeCookoffCards(data.defenderCount,true)+'</div></div></div><div class="cookoff-result" id="co-result" style="opacity:0;"></div></div>';
   playSound('cookoff');await wait(1200);
+  // Flip defender cards one by one
   const rc=area.querySelector('#co-right-cards');
   if(rc){const fd=rc.querySelectorAll('.face-down');const si=CARD_SVG.cookoff.replace(/<\/?svg[^>]*>/g,'');for(let i=0;i<fd.length;i++){await wait(300);fd[i].classList.remove('face-down');fd[i].style.background='linear-gradient(135deg,#DC2626,#F97316)';fd[i].style.border='2px solid #fbbf24';fd[i].innerHTML='<svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">'+si+'</svg>';playSound('flip');}}
   await wait(600);
-  const liw=(data.winner!==G.currentIndex);const le=area.querySelector('#co-left');const re=area.querySelector('#co-right');
+  // Show winner/loser
+  const winner=getPlayer(data.winner);const loser=getPlayer(data.loser);
+  const liw=(data.winner!==defIdx);const le=area.querySelector('#co-left');const re=area.querySelector('#co-right');
   if(liw){le.classList.add('winner-side');re.classList.add('loser-side');}else{re.classList.add('winner-side');le.classList.add('loser-side');}
   const res=area.querySelector('#co-result');res.style.opacity='1';res.innerHTML=ts('cookoffResult',{winner:winner.name,loser:loser.name,n:data.total});
   playSound('win');await wait(1200);
-  // Fly all cook-off cards to loser's station
+  // Fly cards to loser's station
   const loserStation=document.getElementById('spot-'+data.loser) || document.getElementById('station-'+data.loser);
   if(loserStation){
     const allCards=[...area.querySelectorAll('.co-card')];
