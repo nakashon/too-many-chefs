@@ -77,6 +77,9 @@ body::before {
 .avatar-opt { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;cursor:pointer;border:2px solid transparent;transition:all .2s;background:rgba(255,255,255,.05); }
 .avatar-opt:hover { background:rgba(255,255,255,.12);transform:scale(1.15); }
 .avatar-opt.selected { border-color:var(--orange);background:rgba(255,107,53,.2);transform:scale(1.2); }
+.gender-toggle { display:inline-flex;gap:2px; }
+.gender-btn { padding:2px 6px;border-radius:6px;border:1.5px solid rgba(255,255,255,.15);background:transparent;cursor:pointer;font-size:1.1rem;opacity:.5;transition:all .2s; }
+.gender-btn.selected { opacity:1;border-color:var(--golden);background:rgba(247,201,72,.15); }
 
 /* Game Screen */
 #screen-game { justify-content: flex-start; padding: 16px; min-height: 100vh; gap: 12px; }
@@ -197,9 +200,14 @@ body::before {
 .narrator.status-cookoff { color:#fca5a5;background:rgba(230,57,70,.15);border-color:rgba(230,57,70,.3);font-size:1.3rem; }
 .narrator.status-win { color:var(--golden);background:rgba(247,201,72,.15);border-color:rgba(247,201,72,.3);font-size:1.4rem;font-weight:600; }
 
-/* Pending */
-.pending-indicator { background: linear-gradient(135deg, rgba(230,57,70,0.2), rgba(230,57,70,0.1)); border: 2px solid var(--red); border-radius: 14px; padding: 10px 20px; text-align: center; font-weight: 600; color: var(--red); animation: pendingPulse 1.5s ease-in-out infinite; width: 100%; max-width: 800px; }
-@keyframes pendingPulse { 0%, 100% { box-shadow: 0 0 10px rgba(230,57,70,0.2); } 50% { box-shadow: 0 0 25px rgba(230,57,70,0.4); } }
+/* Cook-off Zone */
+#cookoff-zone { width:100%;max-width:800px;min-height:0;transition:all .3s; }
+#cookoff-zone:empty { display:none; }
+.cz-row { display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:rgba(230,57,70,.08);border:1.5px solid rgba(230,57,70,.2);border-radius:12px;animation:fadeIn .4s ease-out; }
+.cz-name { font-weight:600;font-size:1rem;white-space:nowrap; }
+.cz-cards { display:flex;gap:4px;align-items:center; }
+.cz-vs { font-weight:700;color:var(--red);font-size:1.2rem; }
+.cz-result { text-align:center;padding:6px;font-weight:600;font-size:1.05rem;animation:fadeIn .3s ease-out; }
 
 /* Victory */
 #screen-victory { gap: 20px; text-align: center; }
@@ -330,7 +338,7 @@ html[dir="rtl"] .player-row { border-left:none;border-right:4px solid var(--oran
   <div class="turn-banner" id="turn-banner"></div>
   <div class="scoreboard-strip" id="scoreboard-strip"></div>
   <div class="spotlight-row" id="spotlight-row"></div>
-  <div id="pending-indicator" class="pending-indicator" style="display:none;"></div>
+  <div id="cookoff-zone"></div>
   <div class="kitchen-area" id="kitchen-area">
     <div class="card-area" id="card-area"></div>
     <div class="roll-summary" id="roll-summary"></div>
@@ -453,14 +461,14 @@ const STRINGS = {
     summaryDumps: '🫳 {n} to {next}',
     summaryTickets: '📋 {n} still cooking',
     summaryCookoffs: '🔥 {n} cook-off',
-    challenge: '🔥 {name} challenges {next} with {n} Cook-Off order{s}!',
+    challenge: '',
     cookoffWin: '💥 {winner} wins the Cook-Off! {loser} has to cook {n} more orders!',
     error: '⚠️ Something went wrong — continuing...',
     turnOf: "{name}'s Turn!",
-    pending: '🔥 {n} Cook-Off order{s} from <strong>{name}</strong> — you must answer the challenge!',
-    challengeTitle: '🔥 COOK-OFF CHALLENGE! 🔥',
-    throwsDown: '{name} throws down {n} order{s}. Next chef must answer!',
-    challenger: 'Challenger',
+    pending: '',
+    challengeTitle: '',
+    throwsDown: '',
+    challenger: '',
     cookoffTitle: '🔥 COOK-OFF! 🔥',
     cookoffResult: '💥 {winner} wins! {loser} has to cook <strong>{n}</strong> more orders!',
     vs: 'VS',
@@ -530,26 +538,26 @@ const STRINGS = {
     cardDump: 'העבר!',
     cardPlate: 'מוכן!',
     cardCookoff: '!קרב טבחים',
-    draws: '🃏 {name} שולף {n} הזמנות!',
+    draws: '🃏 {name} {v} {n} הזמנות!',
     served: '🍽️ מנה מוכנה! ×{n} — הוגשה!',
     stillCooking: '📋 עוד מבשלים ×{n} — חוזר לתחנה!',
     notMyProblem: '🫳 תעזור לי עם זה! ×{n} → {next}',
     cookoffStay: '🔥 קרב טבחים! ×{n} — הזמנות נשארות',
-    aiThinking: '🤖 {name} סוקר את המטבח...',
+    aiThinking: '🤖 {name} {v} את המטבח...',
     summaryPlates: '🍽️ {n} הוגשו',
     summaryDumps: '🫳 {n} ל{next}',
     summaryTickets: '📋 {n} עדיין מתבשלות',
     summaryCookoffs: '🔥 {n} קרב',
-    challenge: '🔥 {name} מאתגר את {next} עם {n} הזמנות קרב!',
-    cookoffWin: '💥 {winner} ניצח בקרב! {loser} יצטרך לבשל עוד-{n} מנות!',
+    challenge: '',
+    cookoffWin: '💥 {winner} {v} בקרב! {loser} {v2} לבשל עוד-{n} מנות!',
     error: '⚠️ משהו השתבש — ממשיכים...',
     turnOf: 'התור של {name}',
-    pending: '🔥 {n} הזמנות קרב מ<strong>{name}</strong> — יאללה מתחילים!',
-    challengeTitle: '🔥 !קרב טבחים 🔥',
-    throwsDown: '{name} שלף {n} הזמנות. הטבח הבא חייב להכנס לקרב!',
-    challenger: 'מאתגר',
+    pending: '',
+    challengeTitle: '',
+    throwsDown: '',
+    challenger: '',
     cookoffTitle: '🔥 !קרב טבחים 🔥',
-    cookoffResult: '💥 {winner} ניצח! {loser} יצטרך לבשל עוד-<strong>{n}</strong> מנות!',
+    cookoffResult: '💥 {winner} {v} בקרב! {loser} {v2} לבשל עוד-<strong>{n}</strong> מנות!',
     vs: 'נגד',
     victoryTitle: '🏆 !זוכה בשף הזהב 🏆',
     victorySubtitle: '!הראשון שסיים לבשל',
@@ -596,6 +604,7 @@ const STRINGS = {
 };
 function t(key){ return STRINGS[currentLang][key] || STRINGS.en[key] || key; }
 function ts(key, vars){ let s=t(key); if(vars){Object.keys(vars).forEach(k=>{s=s.replace(new RegExp('\\{'+k+'\\}','g'),vars[k]);});} return s; }
+function gv(player, m, f) { return (currentLang==='he' && player.gender==='f') ? f : m; }
 
 function setLang(lang) {
   currentLang = lang;
@@ -735,6 +744,8 @@ function nextTutStep() {
 
 function endTutorial() { showScreen('setup'); }
 
+function pickGender(i,g,btn){$('pgender-'+i).value=g;btn.parentElement.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');}
+
 function initSetup() {
   const sel=$('count-selector'); sel.innerHTML='';
   for(let i=2;i<=6;i++){const b=document.createElement('button');b.className='count-btn'+(i===selectedCount?' selected':'');b.textContent=i;b.onclick=()=>{selectedCount=i;initSetup();};sel.appendChild(b);}
@@ -744,7 +755,7 @@ function initSetup() {
     const row=document.createElement('div');row.className='player-row';row.style.borderLeftColor=PLAYER_COLORS[i];row.style.animationDelay=(i*0.08)+'s';
     const isFirst=i===0;const aiName=shuffledAI[i%shuffledAI.length].name;
     const defaultAvatar=isFirst?CHEF_AVATARS[0]:CHEF_AVATARS[11];
-    row.innerHTML='<span class="chef-hat" id="avatar-display-'+i+'" style="font-size:1.5rem;cursor:pointer;" title="Click to pick avatar">'+defaultAvatar+'</span><input type="text" id="pname-'+i+'" placeholder="'+(isFirst?t('yourName'):t('chef')+' '+(i+1))+'" value="'+(isFirst?'':aiName)+'" maxlength="16">'+(isFirst?'<span style="font-size:0.8rem;color:var(--text-muted);">'+t('you')+'</span>':'<label class="ai-toggle"><input type="checkbox" id="pai-'+i+'" checked><span class="toggle-track"><span class="toggle-thumb"></span></span>'+t('ai')+'</label>')+'<input type="hidden" id="pavatar-'+i+'" value="'+defaultAvatar+'">';
+    row.innerHTML='<span class="chef-hat" id="avatar-display-'+i+'" style="font-size:1.5rem;cursor:pointer;" title="Click to pick avatar">'+defaultAvatar+'</span><input type="text" id="pname-'+i+'" placeholder="'+(isFirst?t('yourName'):t('chef')+' '+(i+1))+'" value="'+(isFirst?'':aiName)+'" maxlength="16">'+(isFirst?'<span style="font-size:0.8rem;color:var(--text-muted);">'+t('you')+'</span>':'<label class="ai-toggle"><input type="checkbox" id="pai-'+i+'" checked><span class="toggle-track"><span class="toggle-thumb"></span></span>'+t('ai')+'</label>')+'<div class="gender-toggle"><button type="button" class="gender-btn selected" data-g="m" onclick="pickGender('+i+',\'m\',this)">👨</button><button type="button" class="gender-btn" data-g="f" onclick="pickGender('+i+',\'f\',this)">👩</button></div><input type="hidden" id="pgender-'+i+'" value="m"><input type="hidden" id="pavatar-'+i+'" value="'+defaultAvatar+'">';
     cfg.appendChild(row);
     const picker=document.createElement('div');picker.className='avatar-picker';picker.id='avatar-picker-'+i;
     CHEF_AVATARS.forEach(av=>{
@@ -767,12 +778,13 @@ function startGame() {
     const nameEl=$('pname-'+i);const aiEl=$('pai-'+i);
     const name=(nameEl.value.trim()||(t('chef')+' '+(i+1)));
     const avatarEl=$('pavatar-'+i);const avatar=avatarEl?avatarEl.value:(i===0?CHEF_AVATARS[0]:CHEF_AVATARS[11]);
-    players.push({name,index:i,cubes:STARTING_CUBES,isAI:i===0?false:(aiEl?aiEl.checked:true),color:PLAYER_COLORS[i],avatar});
+    const genderEl=$('pgender-'+i);const gender=genderEl?genderEl.value:'m';
+    players.push({name,index:i,cubes:STARTING_CUBES,isAI:i===0?false:(aiEl?aiEl.checked:true),color:PLAYER_COLORS[i],avatar,gender});
   }
   G.players=players;G.currentIndex=Math.floor(Math.random()*players.length);G.pendingMatch=null;G.turnNumber=0;
   G.stats={totalPlated:0,totalDumped:0,totalCookoffs:0,totalSentBack:0,turns:0};
   G.seenCards={};
-  $('narrator').innerHTML='';showScreen('game');beginTurn();
+  $('narrator').innerHTML='';$('cookoff-zone').innerHTML='';showScreen('game');beginTurn();
 }
 
 function nextPlayerIndex(from){return(from+1)%G.players.length;}
@@ -826,12 +838,6 @@ function flashStation(index, color, text) {
   s.style.transition = 'background .15s';
   s.style.background = color ? ('rgba(' + (color === '#10B981' ? '16,185,129' : color === '#A855F7' ? '168,85,247' : color === '#EF4444' ? '239,68,68' : '247,201,72') + ',.25)') : '';
   setTimeout(() => { s.style.background = ''; }, 500);
-}
-
-function renderPendingIndicator(){
-  const el=$('pending-indicator');
-  if(G.pendingMatch){const ch=getPlayer(G.pendingMatch.challengerIndex);el.style.display='block';el.innerHTML=ts('pending',{n:G.pendingMatch.count,s:G.pendingMatch.count>1?'s':'',name:ch.name});}
-  else{el.style.display='none';}
 }
 
 function setStatus(msg,cls){const el=$('narrator');el.className='narrator'+(cls?' '+cls:'');el.innerHTML=msg;}
@@ -1120,33 +1126,32 @@ function makeCookoffCards(count,faceDown){
 }
 
 async function showCookoff(data) {
-  const area=$('card-area');playSound('clash');
+  const zone=$('cookoff-zone');playSound('clash');
   if(data.type==='new_challenge'){
     const ch=getPlayer(data.challenger);
-    // Simple: show challenger's cards in a line with their name
-    area.innerHTML='<div class="cookoff-line"><span class="co-name" style="color:'+ch.color+'">'+(ch.avatar||'🧑‍🍳')+' '+ch.name+'</span>'+makeCookoffCards(data.count,false)+'<span class="co-arrow">'+(currentLang==='he'?'⬅':'➡')+'</span><span class="co-pending">?</span></div>';
+    zone.innerHTML='<div class="cz-row"><span class="cz-name" style="color:'+ch.color+'">'+(ch.avatar||'🧑‍🍳')+' '+ch.name+'</span><div class="cz-cards">'+makeCookoffCards(data.count,false)+'</div></div>';
     await wait(1500);return;
   }
-  // Resolution: show both sides on one line
+  // Resolution: add defender to the row
   const defender=currentPlayer();
   const chalIdx=data.type==='defender_wins'?data.loser:data.winner;
   const challenger=getPlayer(chalIdx);
-  area.innerHTML='<div class="cookoff-line"><span class="co-name" style="color:'+challenger.color+'">'+(challenger.avatar||'🧑‍🍳')+' '+challenger.name+'</span>'+makeCookoffCards(data.challengerCount,false)+'<span class="co-vs">'+t('vs')+'</span>'+makeCookoffCards(data.defenderCount,true)+'<span class="co-name" style="color:'+defender.color+'">'+(defender.avatar||'🧑‍🍳')+' '+defender.name+'</span></div>';
+  zone.innerHTML='<div class="cz-row"><span class="cz-name" style="color:'+challenger.color+'">'+(challenger.avatar||'🧑‍🍳')+' '+challenger.name+'</span><div class="cz-cards">'+makeCookoffCards(data.challengerCount,false)+'</div><span class="cz-vs">'+t('vs')+'</span><div class="cz-cards">'+makeCookoffCards(data.defenderCount,true)+'</div><span class="cz-name" style="color:'+defender.color+'">'+(defender.avatar||'🧑‍🍳')+' '+defender.name+'</span></div>';
   playSound('cookoff');await wait(800);
   // Flip defender cards
-  const fd=area.querySelectorAll('.face-down');const si=CARD_SVG.cookoff.replace(/<\/?svg[^>]*>/g,'');
+  const fd=zone.querySelectorAll('.face-down');const si=CARD_SVG.cookoff.replace(/<\/?svg[^>]*>/g,'');
   for(let i=0;i<fd.length;i++){await wait(300);fd[i].classList.remove('face-down');fd[i].style.background='linear-gradient(135deg,#DC2626,#F97316)';fd[i].style.border='2px solid #fbbf24';fd[i].innerHTML='<svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">'+si+'</svg>';playSound('flip');}
   await wait(500);
-  // Show result inline
+  // Show winner result
   const winner=getPlayer(data.winner);const loser=getPlayer(data.loser);
-  const resultDiv=document.createElement('div');resultDiv.className='co-result-line';
+  const resultDiv=document.createElement('div');resultDiv.className='cz-result';
   resultDiv.innerHTML='<span style="color:'+winner.color+'">'+(winner.avatar||'🧑‍🍳')+' '+winner.name+'</span> 🏆 → <span style="color:'+loser.color+'">'+loser.name+' +'+data.total+'</span>';
-  area.appendChild(resultDiv);
+  zone.appendChild(resultDiv);
   playSound('win');await wait(1000);
   // Fly cards to loser
   const loserStation=document.getElementById('spot-'+data.loser) || document.getElementById('station-'+data.loser);
   if(loserStation){
-    const allCards=[...area.querySelectorAll('.co-card')];
+    const allCards=[...zone.querySelectorAll('.co-card')];
     for(let i=0;i<allCards.length;i++){
       const card=allCards[i];
       const cR=card.getBoundingClientRect(),sR=loserStation.getBoundingClientRect();
@@ -1156,17 +1161,18 @@ async function showCookoff(data) {
     }
     await wait(400);
   } else { await wait(800); }
+  zone.innerHTML='';
 }
 
 function beginTurn() {
   isAnimating=false;hasRolled=false;const p=currentPlayer();
   if(p.cubes<=0){p.cubes=0;if(G.pendingMatch)G.pendingMatch=null;victory(G.currentIndex);return;}
-  G.turnNumber++;G.stats.turns++;renderStations();renderPendingIndicator();
+  G.turnNumber++;G.stats.turns++;renderStations();
   $('card-area').innerHTML='';$('roll-summary').innerHTML='';
   $('turn-banner').innerHTML=(p.avatar||'🧑‍🍳')+' <span style="color:'+p.color+'">'+ts('turnOf',{name:p.name})+"</span>";
   $('turn-banner').style.borderColor=p.color;
   $('btn-roll').classList.remove('hidden');$('btn-continue').classList.add('hidden');
-  if(p.isAI){$('btn-roll').classList.add('hidden');setStatus(ts('aiThinking',{name:p.name}));setTimeout(()=>doRoll(),800+Math.random()*600);}
+  if(p.isAI){$('btn-roll').classList.add('hidden');setStatus(ts('aiThinking',{name:p.name,v:gv(p,'סוקר','סוקרת')}));setTimeout(()=>doRoll(),800+Math.random()*600);}
 }
 
 async function doRoll() {
@@ -1175,7 +1181,7 @@ async function doRoll() {
   const p=currentPlayer();const nextIdx=nextPlayerIndex(G.currentIndex);const nextP=getPlayer(nextIdx);
   try {
     const results=rollCards(p.cubes);const counts=countFaces(results);
-    setStatus(ts('draws',{name:p.name,n:p.cubes,s:p.cubes>1?'s':''}));
+    setStatus(ts('draws',{name:p.name,n:p.cubes,s:p.cubes>1?'s':'',v:gv(p,'שולף','שולפת')}));
     const area=await animateCards(results);showRollSummary(counts);await wait(300);
 
     // Resolve each card one by one with animations
@@ -1200,8 +1206,6 @@ async function doRoll() {
     } else if(counts.cookoffs>0){G.pendingMatch={count:counts.cookoffs,challengerIndex:G.currentIndex};cr={type:'new_challenge',count:counts.cookoffs,challenger:G.currentIndex};}
 
     if(cr){
-      if(cr.type==='new_challenge')setStatus(ts('challenge',{name:p.name,next:nextP.name,n:cr.count,s:cr.count>1?'s':''}),'status-cookoff');
-      else setStatus(ts('cookoffWin',{winner:getPlayer(cr.winner).name,loser:getPlayer(cr.loser).name,n:cr.total}),'status-cookoff');
       await showCookoff(cr);
       // Render first so stations are fresh, THEN add floats
       renderStations();
@@ -1215,7 +1219,7 @@ async function doRoll() {
       }
       await wait(1200);
     }
-    renderStations();renderPendingIndicator();
+    renderStations();
     if(p.cubes<=0&&!G.pendingMatch){p.cubes=0;await wait(500);victory(G.currentIndex);return;}
   } catch(err) {
     console.error('doRoll error:',err);
