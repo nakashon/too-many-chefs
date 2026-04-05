@@ -386,7 +386,7 @@ let currentLang = 'en';
 const STRINGS = {
   en: {
     title: '🍳 Too Many Cooks! 🔥',
-    subtitle: 'A chaotic kitchen card game',
+    subtitle: 'A chaotic kitchen order game',
     lore1: 'Draw cards. Plate dishes. Dump disasters on the next chef.',
     lore2: 'Survive the kitchen — or go down swinging in a <strong style="color:var(--red)">Cook-Off</strong>!',
     goal: '🏁 First chef to clear all orders wins!',
@@ -402,13 +402,13 @@ const STRINGS = {
     chef: 'Chef',
     you: 'YOU',
     ai: 'AI',
-    drawBtn: 'DRAW CARDS! 🃏',
+    drawBtn: 'DRAW ORDERS! 🃏',
     nextBtn: 'NEXT CHEF ➡️',
     cardTicket: 'Still Cooking',
     cardDump: 'Not My Problem!',
     cardPlate: 'Order Ready!',
     cardCookoff: 'COOK-OFF!',
-    draws: '{name} draws {n} card{s}!',
+    draws: '{name} draws {n} order{s}!',
     served: '🍽️ Order Ready! ×{n} — Served!',
     stillCooking: '📋 Still Cooking ×{n} — back to your station!',
     notMyProblem: '🫳 Not My Problem! ×{n} → {next}',
@@ -418,17 +418,14 @@ const STRINGS = {
     summaryDumps: '🫳 {n} to {next}',
     summaryTickets: '📋 {n} still cooking',
     summaryCookoffs: '🔥 {n} cook-off',
-    challenge: '🔥 {name} challenges {next} with {n} Cook-Off card{s}!',
-    tie: '⚡ TIE! {n} cards cascade to {next}!',
+    challenge: '🔥 {name} challenges {next} with {n} Cook-Off order{s}!',
     cookoffWin: '💥 {winner} wins the Cook-Off! {loser} has to cook {n} more orders!',
     error: '⚠️ Something went wrong — continuing...',
     turnOf: "{name}'s Turn!",
-    pending: '🔥 {n} Cook-Off card{s} from <strong>{name}</strong> — you must answer the challenge!',
+    pending: '🔥 {n} Cook-Off order{s} from <strong>{name}</strong> — you must answer the challenge!',
     challengeTitle: '🔥 COOK-OFF CHALLENGE! 🔥',
-    throwsDown: '{name} throws down {n} card{s}. Next chef must answer!',
-    tieTitle: '⚡ TIE — REMATCH! ⚡',
+    throwsDown: '{name} throws down {n} order{s}. Next chef must answer!',
     challenger: 'Challenger',
-    deadHeat: 'DEAD HEAT! {n} cards cascade to {next}! 🔥🔥🔥',
     cookoffTitle: '🔥 COOK-OFF! 🔥',
     cookoffResult: '💥 {winner} wins! {loser} has to cook <strong>{n}</strong> more orders!',
     vs: 'VS',
@@ -439,8 +436,8 @@ const STRINGS = {
     statPlated: 'Dishes Plated 🍽️',
     statDumped: 'Orders Dumped 🫳',
     statCookoffs: 'Cook-Offs 🔥',
-    cards: 'cards',
-    card: 'card',
+    cards: 'orders',
+    card: 'order',
     sendBack: '😤 Send It Back! ×{n} — cook it again!',
     summarySendBack: '😤 {n} sent back',
     cardSendback: 'Send It Back!',
@@ -449,7 +446,7 @@ const STRINGS = {
     tipTicket: 'This order stays at your station. Keep cooking next turn!',
     tipPlate: 'Served! This order goes to the customer!',
     tipDump: 'Slide this order to the next chef\'s station!',
-    tipCookoff: 'Challenge! Compare cook-off cards — loser cooks them all!',
+    tipCookoff: 'Challenge! Compare cook-off orders — loser cooks them all!',
     tipSendback: 'A customer sent a dish back! Cook it again!',
   },
   he: {
@@ -470,33 +467,30 @@ const STRINGS = {
     chef: 'שף',
     you: 'אתה',
     ai: 'בוט',
-    drawBtn: '!שלפו קלפים 🃏',
+    drawBtn: '!שלפו הזמנות 🃏',
     nextBtn: '⬅️ הטבח הבא',
     cardTicket: 'עדיין בהכנה',
     cardDump: 'העבר!',
     cardPlate: 'מוכן!',
     cardCookoff: '!קרב טבחים',
-    draws: '🃏 {name} שולף {n} קלפים!',
+    draws: '🃏 {name} שולף {n} הזמנות!',
     served: '🍽️ מנה מוכנה! ×{n} — הוגשה!',
     stillCooking: '📋 עוד מבשלים ×{n} — חוזר לתחנה!',
     notMyProblem: '🫳 תעזור לי עם זה! ×{n} → {next}',
-    cookoffStay: '🔥 קרב טבחים! ×{n} — קלפים נשארים',
+    cookoffStay: '🔥 קרב טבחים! ×{n} — הזמנות נשארות',
     aiThinking: '🤖 {name} סוקר את המטבח...',
     summaryPlates: '🍽️ {n} הוגשו',
     summaryDumps: '🫳 {n} ל{next}',
     summaryTickets: '📋 {n} עדיין מתבשלות',
     summaryCookoffs: '🔥 {n} קרב',
-    challenge: '🔥 {name} מאתגר את {next} עם {n} קלפי קרב!',
-    tie: '⚡ תיקו! {n} קלפים עוברים ל{next}!',
+    challenge: '🔥 {name} מאתגר את {next} עם {n} הזמנות קרב!',
     cookoffWin: '💥 {winner} ניצח בקרב! {loser} יצטרך לבשל עוד-{n} מנות!',
     error: '⚠️ משהו השתבש — ממשיכים...',
     turnOf: 'התור של {name}',
-    pending: '🔥 {n} קלפי קרב מ<strong>{name}</strong> — יאללה מתחילים!',
+    pending: '🔥 {n} הזמנות קרב מ<strong>{name}</strong> — יאללה מתחילים!',
     challengeTitle: '🔥 !קרב טבחים 🔥',
-    throwsDown: '{name} שלף {n} קלפים. הטבח הבא חייב להכנס לקרב!',
-    tieTitle: '⚡ !תיקו — משחק חוזר ⚡',
+    throwsDown: '{name} שלף {n} הזמנות. הטבח הבא חייב להכנס לקרב!',
     challenger: 'מאתגר',
-    deadHeat: '!תיקו מושלם! {n} קלפים עוברים ל{next}! 🔥🔥🔥',
     cookoffTitle: '🔥 !קרב טבחים 🔥',
     cookoffResult: '💥 {winner} ניצח! {loser} יצטרך לבשל עוד-<strong>{n}</strong> מנות!',
     vs: 'נגד',
@@ -507,8 +501,8 @@ const STRINGS = {
     statPlated: '🍽️ מנות שהוגשו',
     statDumped: '🫳 הזמנות שהועברו',
     statCookoffs: '🔥 קרבות טבחים',
-    cards: 'קלפים',
-    card: 'קלף',
+    cards: 'הזמנות',
+    card: 'הזמנה',
     sendBack: '😤 חזרה מנה! ×{n} — בשל את המנה מחדש',
     summarySendBack: '😤 {n} חזרו',
     cardSendback: 'מנה חזרה!',
@@ -517,7 +511,7 @@ const STRINGS = {
     tipTicket: 'ההזמנה נשארת אצלך. המשך לבשל בתור הבא!',
     tipPlate: 'הוגשה! ההזמנה יוצאת ללקוח!',
     tipDump: 'העבר את ההזמנה לטבח הבא!',
-    tipCookoff: 'אתגר! השוו קלפי קרב — המפסיד צריך לבשל את הכל!',
+    tipCookoff: 'אתגר! השוו הזמנות קרב — המפסיד צריך לבשל את הכל!',
     tipSendback: 'לקוח החזיר מנה! בשל אותה שוב!',
   }
 };
@@ -998,11 +992,6 @@ async function showCookoff(data) {
     area.innerHTML='<div class="cookoff-box"><div class="cookoff-title">'+t('challengeTitle')+'</div><div class="cookoff-versus"><div class="cookoff-side"><div class="side-name" style="color:'+ch.color+'">'+ch.name+'</div><div class="side-cards">'+makeCookoffCards(data.count,false)+'</div></div><div class="cookoff-vs">➡</div><div class="cookoff-side"><div class="side-name" style="color:'+np.color+'">'+np.name+'</div><div class="side-cards">'+makeCookoffCards(data.count,true)+'</div></div></div><div class="cookoff-result">'+ts('throwsDown',{name:ch.name,n:data.count,s:data.count>1?'s':''})+'</div></div>';
     await wait(2500);return;
   }
-  if(data.type==='tie'){
-    const np=getPlayer(nextPlayerIndex(G.currentIndex));
-    area.innerHTML='<div class="cookoff-box"><div class="cookoff-title">'+t('tieTitle')+'</div><div class="cookoff-versus"><div class="cookoff-side"><div class="side-name">'+t('challenger')+'</div><div class="side-cards">'+makeCookoffCards(data.challengerCount,false)+'</div></div><div class="cookoff-vs">'+t('vs')+'</div><div class="cookoff-side"><div class="side-name" style="color:'+currentPlayer().color+'">'+currentPlayer().name+'</div><div class="side-cards">'+makeCookoffCards(data.defenderCount,false)+'</div></div></div><div class="cookoff-result" style="color:var(--golden);">'+ts('deadHeat',{n:data.total,next:np.name})+'</div></div>';
-    playSound('cookoff');await wait(3000);return;
-  }
   const winner=getPlayer(data.winner);const loser=getPlayer(data.loser);const leftP=data.type==='defender_wins'?loser:winner;
   area.innerHTML='<div class="cookoff-box"><div class="cookoff-title">'+t('cookoffTitle')+'</div><div class="cookoff-versus"><div class="cookoff-side" id="co-left"><div class="side-name" style="color:'+leftP.color+'">'+leftP.name+'</div><div class="side-cards">'+makeCookoffCards(data.challengerCount,false)+'</div></div><div class="cookoff-vs">'+t('vs')+'</div><div class="cookoff-side" id="co-right"><div class="side-name" style="color:'+currentPlayer().color+'">'+currentPlayer().name+'</div><div class="side-cards" id="co-right-cards">'+makeCookoffCards(data.defenderCount,true)+'</div></div></div><div class="cookoff-result" id="co-result" style="opacity:0;"></div></div>';
   playSound('cookoff');await wait(1200);
@@ -1068,15 +1057,14 @@ async function doRoll() {
     let cr=null;
     if(G.pendingMatch){
       const pm=G.pendingMatch;const total=pm.count+counts.cookoffs;
-      if(counts.cookoffs>pm.count){const ch=getPlayer(pm.challengerIndex);if(ch.cubes>0)ch.cubes+=total;cr={type:'defender_wins',winner:G.currentIndex,loser:pm.challengerIndex,total,defenderCount:counts.cookoffs,challengerCount:pm.count};G.pendingMatch=null;}
-      else if(counts.cookoffs<pm.count){p.cubes+=total;cr={type:'defender_loses',winner:pm.challengerIndex,loser:G.currentIndex,total,defenderCount:counts.cookoffs,challengerCount:pm.count};G.pendingMatch=null;}
-      else{G.pendingMatch={count:total,challengerIndex:G.currentIndex};cr={type:'tie',total,challengerCount:pm.count,defenderCount:counts.cookoffs};}
+      if(counts.cookoffs>pm.count){const ch=getPlayer(pm.challengerIndex);if(ch.cubes>0)ch.cubes+=total;cr={type:'defender_wins',winner:G.currentIndex,loser:pm.challengerIndex,total,defenderCount:counts.cookoffs,challengerCount:pm.count};}
+      else{p.cubes+=total;cr={type:'defender_loses',winner:pm.challengerIndex,loser:G.currentIndex,total,defenderCount:counts.cookoffs,challengerCount:pm.count};}
+      G.pendingMatch=null;
       G.stats.totalCookoffs++;
     } else if(counts.cookoffs>0){G.pendingMatch={count:counts.cookoffs,challengerIndex:G.currentIndex};cr={type:'new_challenge',count:counts.cookoffs,challenger:G.currentIndex};}
 
     if(cr){
       if(cr.type==='new_challenge')setStatus(ts('challenge',{name:p.name,next:nextP.name,n:cr.count,s:cr.count>1?'s':''}),'status-cookoff');
-      else if(cr.type==='tie')setStatus(ts('tie',{n:cr.total,next:getPlayer(nextPlayerIndex(G.currentIndex)).name}),'status-cookoff');
       else setStatus(ts('cookoffWin',{winner:getPlayer(cr.winner).name,loser:getPlayer(cr.loser).name,n:cr.total}),'status-cookoff');
       await showCookoff(cr);
       // Render first so stations are fresh, THEN add floats
