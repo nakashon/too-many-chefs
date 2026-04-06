@@ -794,7 +794,7 @@ function startFlipPhase() {
   hideBtn('btn-stop');
   document.getElementById('flip-summary').innerHTML = '';
 
-  // Animate cards dealing out + count dropping to 0
+  // Animate cards dealing out
   const containers = document.querySelectorAll('.card-container');
   containers.forEach((c, i) => {
     c.style.opacity = '0';
@@ -804,20 +804,7 @@ function startFlipPhase() {
     }, i * 80);
   });
 
-  const spotCount = document.getElementById('spot-count-' + G.currentIndex);
   const dealTime = count * 80 + 300;
-  if (spotCount) {
-    let displayed = count;
-    const step = Math.max(1, Math.floor(count / Math.min(count, 6)));
-    const interval = setInterval(() => {
-      displayed = Math.max(0, displayed - step);
-      spotCount.innerHTML = `${displayed} <small>${t('orders')}</small>`;
-      if (displayed <= 0) clearInterval(interval);
-    }, 80);
-    spotCount.classList.add('count-shrink');
-    setTimeout(() => spotCount.classList.remove('count-shrink'), 400);
-    floatNumber(document.getElementById('spot-' + G.currentIndex), `-${count}`, 'var(--orange)');
-  }
 
   // Enable taps after deal animation
   setTimeout(() => {
@@ -941,7 +928,6 @@ function handleBust() {
   hideBtn('btn-stop');
 
   const p = currentPlayer();
-  const totalCards = G.luck.results.length;
 
   // Show bust overlay
   const kitchen = document.getElementById('kitchen-area');
@@ -964,15 +950,6 @@ function handleBust() {
       el.classList.remove('card-shake');
       el.classList.add('card-fly-back');
     });
-
-    // Restore count back up with float
-    const spotCount = document.getElementById('spot-count-' + G.currentIndex);
-    if (spotCount) {
-      spotCount.innerHTML = `${p.orders} <small>${t('orders')}</small>`;
-      spotCount.classList.add('count-punch');
-      setTimeout(() => spotCount.classList.remove('count-punch'), 400);
-    }
-    floatNumber(document.getElementById('spot-' + G.currentIndex), `+${totalCards}`, 'var(--red)');
   }, 1400);
 
   // Auto-advance after cards fly back
@@ -1014,6 +991,14 @@ function stopFlipping() {
       p.orders -= readyCount;
       G.stats.totalServed += readyCount;
 
+      const spotCount = document.getElementById('spot-count-' + G.currentIndex);
+      if (spotCount) {
+        spotCount.innerHTML = `${p.orders} <small>${t('orders')}</small>`;
+        spotCount.classList.add('count-shrink');
+        setTimeout(() => spotCount.classList.remove('count-shrink'), 400);
+      }
+      floatNumber(document.getElementById('spot-' + G.currentIndex), `-${readyCount}`, 'var(--green)');
+
       setNarrator(t('served', { n: readyCount }), 'status-ready');
       SFX.ready();
     }, delay);
@@ -1033,6 +1018,16 @@ function stopFlipping() {
       np.orders += dumpCount;
       G.stats.totalDumped += dumpCount;
 
+      // Current player loses orders
+      const spotCount = document.getElementById('spot-count-' + G.currentIndex);
+      if (spotCount) {
+        spotCount.innerHTML = `${p.orders} <small>${t('orders')}</small>`;
+        spotCount.classList.add('count-shrink');
+        setTimeout(() => spotCount.classList.remove('count-shrink'), 400);
+      }
+      floatNumber(document.getElementById('spot-' + G.currentIndex), `-${dumpCount}`, 'var(--purple)');
+
+      // Next player gains orders
       const nIdx = nextPlayerIndex();
       const spotCountNext = document.getElementById('spot-count-' + nIdx);
       if (spotCountNext) {
@@ -1040,9 +1035,6 @@ function stopFlipping() {
         spotCountNext.classList.add('count-punch');
         setTimeout(() => spotCountNext.classList.remove('count-punch'), 400);
       }
-      const spotNextEl = document.getElementById('spot-' + nIdx);
-      if (spotNextEl) { spotNextEl.classList.add('blink-purple'); setTimeout(() => spotNextEl.classList.remove('blink-purple'), 400); }
-
       floatNumber(document.getElementById('spot-' + nIdx), `+${dumpCount}`, 'var(--purple)');
 
       setNarrator(t('dumped', { n: dumpCount, next: np.name }), 'status-dump');
@@ -1064,18 +1056,6 @@ function stopFlipping() {
           if (card) card.classList.add('card-fly-back');
         }
       }
-
-      // Update current player count back up
-      const spotCount = document.getElementById('spot-count-' + G.currentIndex);
-      if (spotCount) {
-        spotCount.innerHTML = `${p.orders} <small>${t('orders')}</small>`;
-        spotCount.classList.add('count-punch');
-        setTimeout(() => spotCount.classList.remove('count-punch'), 400);
-      }
-      const spotEl = document.getElementById('spot-' + G.currentIndex);
-      if (spotEl) { spotEl.classList.add('blink-green'); setTimeout(() => spotEl.classList.remove('blink-green'), 400); }
-
-      floatNumber(document.getElementById('spot-' + G.currentIndex), `+${returningCount}`, 'var(--teal)');
 
       if (readyCount === 0 && dumpCount === 0) {
         setNarrator(t('stillCooking', { n: returningCount }), 'status-cooking');
