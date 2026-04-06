@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🍳 The Lazy Chef!</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+<title>🔪 Chop Chop!</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔪</text></svg>">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Patrick+Hand&display=swap');
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -321,8 +321,8 @@ html[dir="rtl"] .player-row { border-left:none;border-right:4px solid var(--oran
 <!-- TITLE SCREEN -->
 <div id="screen-title" class="screen active">
   <div class="title-float-container" id="floating-food"></div>
-  <div class="title-logo" id="title-logo">🍳 The Lazy Chef! 😴</div>
-  <div class="title-sub" id="title-sub">Clear your orders. Be the laziest.</div>
+  <div class="title-logo" id="title-logo">🔪 Chop Chop! ⚡</div>
+  <div class="title-sub" id="title-sub">Clear your orders. Be the fastest chef!</div>
   <div class="title-lore" id="title-lore">
     Flip cards one at a time. Serve orders, dump them on others — but if you hit <strong style="color:var(--red)">Burnt</strong>, your whole turn goes up in smoke! 🔥<br>Know when to stop.
   </div>
@@ -413,8 +413,8 @@ const FOOD_EMOJIS = ['🍕','🌮','🍔','🍩','🧁','🥐','🍣','🍗','�
 let currentLang = 'en';
 const STRINGS = {
   en: {
-    title: '🍳 The Lazy Chef! 😴',
-    subtitle: 'Clear your orders. Be the laziest.',
+    title: '🔪 Chop Chop! ⚡',
+    subtitle: 'Clear your orders. Be the fastest chef!',
     lore: 'Flip cards one at a time. Serve orders, dump them on others — but if you hit <strong style="color:var(--red)">Burnt</strong>, your whole turn goes up in smoke! 🔥<br>Know when to stop.',
     goal: '🏁 First chef to clear all orders wins!',
     startBtn: 'START COOKING! 🔥',
@@ -456,7 +456,7 @@ const STRINGS = {
     cardSwap: 'SWAP!',
     victoryTitle: '🏆 KITCHEN CLOSED! 🏆',
     victoryWinner: '{avatar} {name} wins!',
-    victorySubtitle: 'The laziest chef in the kitchen!',
+    victorySubtitle: 'The fastest chef in the kitchen!',
     statTurns: 'Turns',
     statServed: 'Served',
     statDumped: 'Dumped',
@@ -474,8 +474,8 @@ const STRINGS = {
     confirmRestart: 'Restart the game?',
   },
   he: {
-    title: '🍳 השף העצלן! 😴',
-    subtitle: 'סלקו את ההזמנות. היו הכי עצלנים.',
+    title: '🔪 !צ׳ופ צ׳ופ ⚡',
+    subtitle: 'סלקו את ההזמנות. היו השף הכי מהיר!',
     lore: 'הפכו קלפים אחד אחד. הגישו הזמנות, העבירו לאחרים — אבל אם נפל לכם <strong style="color:var(--red)">נשרף</strong>, כל התור עולה באש! 🔥<br>דעו מתי לעצור.',
     goal: 'השף הראשון שמסלק את כל ההזמנות מנצח! 🏁',
     startBtn: 'בואו לבשל! 🔥',
@@ -517,7 +517,7 @@ const STRINGS = {
     cardSwap: 'החלפה!',
     victoryTitle: 'המטבח סגור! 🏆',
     victoryWinner: '{name} {avatar} ניצח!',
-    victorySubtitle: 'השף הכי עצלן במטבח!',
+    victorySubtitle: 'השף הכי מהיר במטבח!',
     statTurns: 'תורות',
     statServed: 'הוגש',
     statDumped: 'הועבר',
@@ -601,7 +601,7 @@ function setLang(lang) {
 }
 
 function updateAllText() {
-  document.getElementById('title-logo').textContent = currentLang === 'en' ? '🍳 The Lazy Chef! 😴' : '🍳 השף העצלן! 😴';
+  document.getElementById('title-logo').textContent = currentLang === 'en' ? '🔪 Chop Chop! ⚡' : '🔪 !צ׳ופ צ׳ופ ⚡';
   document.getElementById('title-sub').textContent = t('subtitle');
   document.getElementById('title-lore').innerHTML = t('lore');
   document.getElementById('title-goal').textContent = t('goal');
@@ -839,13 +839,12 @@ function renderSpotlight() {
 
 // ==================== CARD GENERATION ====================
 function rollCards(count) {
-  // Heat-based probabilities (out of 12):
-  // L: COOKING 6, READY 2, DUMP 2, BURNT 1, SWAP 1
-  // M: COOKING 5, READY 2, DUMP 2, BURNT 2, SWAP 1
-  // H: COOKING 4, READY 2, DUMP 2, BURNT 3, SWAP 1
+  // Heat-based probabilities (out of variable total):
+  // Swap weight = half of burnt weight (rounded up), min 0.5
   const burntWeight = selectedHeat === 'L' ? 1 : selectedHeat === 'H' ? 3 : 2;
-  const cookWeight = 7 - burntWeight; // L=6, M=5, H=4
-  const total = cookWeight + 2 + 2 + burntWeight + 1; // always 12
+  const swapWeight = burntWeight / 2;
+  const cookWeight = 6;
+  const total = cookWeight + 2 + 2 + burntWeight + swapWeight;
   const results = [];
   for (let i = 0; i < count; i++) {
     const roll = Math.random() * total;
@@ -1007,94 +1006,191 @@ function updateFlipSummary() {
 // ==================== SWAP ====================
 function handleSwap() {
   G.luck.busted = true; // prevent further flips
-  SFX.swap();
   disableAllCards();
   hideBtn('btn-stop');
+  isAnimating = true;
   const myTurnId = turnId;
 
-  // Show swap overlay
-  const kitchen = document.getElementById('kitchen-area');
-  const overlay = document.createElement('div');
-  overlay.className = 'swap-overlay';
-  overlay.innerHTML = `<div class="swap-text">${t('swap')}</div>`;
-  kitchen.appendChild(overlay);
+  const p = currentPlayer();
+  const np = nextPlayer();
+  const readyCount = countFlippedType(CARD.READY);
+  const dumpCount = countFlippedType(CARD.DUMP);
+  const cookingCount = countFlippedType(CARD.COOKING);
+  const unflippedCount = G.luck.flipped.filter(f => !f).length;
+  const returningCount = cookingCount + unflippedCount;
 
-  setNarrator(t('swapMsg'), '');
+  // ---- Phase 1: Resolve flipped cards (same as stopFlipping) ----
+  let delay = 0;
 
-  // Shuffle order counts
-  const orderCounts = G.players.map(p => p.orders);
-  let shuffled;
-  if (G.players.length === 2) {
-    shuffled = [orderCounts[1], orderCounts[0]];
-  } else {
-    shuffled = [...orderCounts];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    // Ensure at least one position changed
-    if (shuffled.every((v, i) => v === orderCounts[i])) {
-      [shuffled[0], shuffled[1]] = [shuffled[1], shuffled[0]];
-    }
-  }
-
-  // Animate stations swapping after overlay
-  setTimeout(() => {
-    if (turnId !== myTurnId) return;
-    overlay.remove();
-
-    // Add swap animation to all station panels
-    document.querySelectorAll('.spot-station').forEach(el => {
-      el.classList.add('spot-swapping');
-    });
-
-    // Fly all cards back
-    document.querySelectorAll('.card-container').forEach(el => {
-      el.classList.add('card-fly-back');
-    });
-  }, 1200);
-
-  // Apply new counts and update display
-  setTimeout(() => {
-    if (turnId !== myTurnId) return;
-
-    G.players.forEach((p, i) => {
-      const oldOrders = p.orders;
-      p.orders = shuffled[i];
-      const diff = p.orders - oldOrders;
-      const spotCount = document.getElementById('spot-count-' + i);
-      if (spotCount) {
-        spotCount.innerHTML = `${p.orders} <small>${t('orders')}</small>`;
-        if (diff !== 0) {
-          spotCount.classList.add(diff > 0 ? 'count-punch' : 'count-shrink');
-          setTimeout(() => spotCount.classList.remove('count-punch', 'count-shrink'), 400);
+  if (readyCount > 0) {
+    setTimeout(() => {
+      if (turnId !== myTurnId) return;
+      for (let i = 0; i < G.luck.results.length; i++) {
+        if (G.luck.flipped[i] && G.luck.results[i] === CARD.READY) {
+          const card = document.querySelector(`.card-container[data-index="${i}"]`);
+          if (card) card.classList.add('card-fly-up');
         }
       }
-      if (diff !== 0) {
-        const sign = diff > 0 ? '+' : '';
-        const color = diff > 0 ? 'var(--red)' : 'var(--green)';
-        floatNumber(document.getElementById('spot-' + i), `${sign}${diff}`, color);
+      p.orders -= readyCount;
+      G.stats.totalServed += readyCount;
+      const spotCount = document.getElementById('spot-count-' + G.currentIndex);
+      if (spotCount) {
+        spotCount.innerHTML = `${p.orders} <small>${t('orders')}</small>`;
+        spotCount.classList.add('count-shrink');
+        setTimeout(() => spotCount.classList.remove('count-shrink'), 400);
       }
-    });
+      floatNumber(document.getElementById('spot-' + G.currentIndex), `-${readyCount}`, 'var(--green)');
+      setNarrator(t('served', { n: readyCount }), 'status-ready');
+      SFX.ready();
+    }, delay);
+    delay += 900;
+  }
 
-    renderScoreboard();
-    document.getElementById('flip-summary').innerHTML = '';
+  if (dumpCount > 0) {
+    setTimeout(() => {
+      if (turnId !== myTurnId) return;
+      for (let i = 0; i < G.luck.results.length; i++) {
+        if (G.luck.flipped[i] && G.luck.results[i] === CARD.DUMP) {
+          const card = document.querySelector(`.card-container[data-index="${i}"]`);
+          if (card) card.classList.add('card-fly-right');
+        }
+      }
+      p.orders -= dumpCount;
+      np.orders += dumpCount;
+      G.stats.totalDumped += dumpCount;
+      const spotCount = document.getElementById('spot-count-' + G.currentIndex);
+      if (spotCount) {
+        spotCount.innerHTML = `${p.orders} <small>${t('orders')}</small>`;
+        spotCount.classList.add('count-shrink');
+        setTimeout(() => spotCount.classList.remove('count-shrink'), 400);
+      }
+      floatNumber(document.getElementById('spot-' + G.currentIndex), `-${dumpCount}`, 'var(--purple)');
+      const nIdx = nextPlayerIndex();
+      const spotCountNext = document.getElementById('spot-count-' + nIdx);
+      if (spotCountNext) {
+        spotCountNext.innerHTML = `${np.orders} <small>${t('orders')}</small>`;
+        spotCountNext.classList.add('count-punch');
+        setTimeout(() => spotCountNext.classList.remove('count-punch'), 400);
+      }
+      floatNumber(document.getElementById('spot-' + nIdx), `+${dumpCount}`, 'var(--purple)');
+      setNarrator(t('dumped', { n: dumpCount, next: np.name }), 'status-dump');
+      SFX.dump();
+    }, delay);
+    delay += 900;
+  }
 
-    // Check for victory
-    const winner = G.players.find(p => p.orders <= 0);
-    if (winner) {
-      setTimeout(() => showVictory(winner), 600);
-      return;
-    }
-  }, 1800);
+  // Fly remaining cards back
+  if (returningCount > 0) {
+    setTimeout(() => {
+      if (turnId !== myTurnId) return;
+      for (let i = 0; i < G.luck.results.length; i++) {
+        if ((G.luck.flipped[i] && G.luck.results[i] === CARD.COOKING) || !G.luck.flipped[i]) {
+          const card = document.querySelector(`.card-container[data-index="${i}"]`);
+          if (card) card.classList.add('card-fly-back');
+        }
+      }
+    }, delay);
+    delay += 600;
+  }
 
-  // Auto-advance
+  // Also fly swap card back
   setTimeout(() => {
     if (turnId !== myTurnId) return;
-    document.querySelectorAll('.spot-station').forEach(el => el.classList.remove('spot-swapping'));
-    isAnimating = false;
-    nextTurn();
-  }, 2800);
+    for (let i = 0; i < G.luck.results.length; i++) {
+      if (G.luck.flipped[i] && G.luck.results[i] === CARD.SWAP) {
+        const card = document.querySelector(`.card-container[data-index="${i}"]`);
+        if (card) card.classList.add('card-fly-back');
+      }
+    }
+  }, delay);
+
+  renderScoreboard();
+
+  // Check victory after resolution
+  if (p.orders <= 0) {
+    setTimeout(() => {
+      if (turnId !== myTurnId) return;
+      showVictory(p);
+    }, delay + 400);
+    return;
+  }
+
+  // ---- Phase 2: SWAP overlay + shuffle ----
+  const swapStart = delay + 600;
+
+  // Compute shuffle AFTER resolution (orders already updated)
+  setTimeout(() => {
+    if (turnId !== myTurnId) return;
+    SFX.swap();
+
+    const kitchen = document.getElementById('kitchen-area');
+    const overlay = document.createElement('div');
+    overlay.className = 'swap-overlay';
+    overlay.innerHTML = `<div class="swap-text">${t('swap')}</div>`;
+    kitchen.appendChild(overlay);
+    setNarrator(t('swapMsg'), '');
+
+    const orderCounts = G.players.map(pl => pl.orders);
+    let shuffled;
+    if (G.players.length === 2) {
+      shuffled = [orderCounts[1], orderCounts[0]];
+    } else {
+      shuffled = [...orderCounts];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      if (shuffled.every((v, i) => v === orderCounts[i])) {
+        [shuffled[0], shuffled[1]] = [shuffled[1], shuffled[0]];
+      }
+    }
+
+    // Animate stations after brief overlay
+    setTimeout(() => {
+      if (turnId !== myTurnId) return;
+      overlay.remove();
+      document.querySelectorAll('.spot-station').forEach(el => el.classList.add('spot-swapping'));
+    }, 1000);
+
+    // Apply shuffled counts
+    setTimeout(() => {
+      if (turnId !== myTurnId) return;
+      G.players.forEach((pl, i) => {
+        const oldOrders = pl.orders;
+        pl.orders = shuffled[i];
+        const diff = pl.orders - oldOrders;
+        const sc = document.getElementById('spot-count-' + i);
+        if (sc) {
+          sc.innerHTML = `${pl.orders} <small>${t('orders')}</small>`;
+          if (diff !== 0) {
+            sc.classList.add(diff > 0 ? 'count-punch' : 'count-shrink');
+            setTimeout(() => sc.classList.remove('count-punch', 'count-shrink'), 400);
+          }
+        }
+        if (diff !== 0) {
+          const sign = diff > 0 ? '+' : '';
+          const color = diff > 0 ? 'var(--red)' : 'var(--green)';
+          floatNumber(document.getElementById('spot-' + i), `${sign}${diff}`, color);
+        }
+      });
+      renderScoreboard();
+      document.getElementById('flip-summary').innerHTML = '';
+
+      const winner = G.players.find(pl => pl.orders <= 0);
+      if (winner) {
+        setTimeout(() => showVictory(winner), 600);
+        return;
+      }
+    }, 1600);
+
+    // Auto-advance
+    setTimeout(() => {
+      if (turnId !== myTurnId) return;
+      document.querySelectorAll('.spot-station').forEach(el => el.classList.remove('spot-swapping'));
+      isAnimating = false;
+      nextTurn();
+    }, 2600);
+  }, swapStart);
 }
 
 // ==================== BUST ====================
