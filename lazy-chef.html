@@ -106,13 +106,14 @@ html[dir="rtl"] .player-row { border-left:none;border-right:4px solid var(--oran
 .sb-chip.sb-zero { border-color:var(--green);background:rgba(72,187,120,.15); }
 
 /* Spotlight */
-.spotlight-row { display:flex;gap:16px;justify-content:center;width:100%;max-width:900px;align-items:stretch; }
+.spotlight-row { display:flex;gap:10px;justify-content:center;width:100%;max-width:900px;align-items:stretch;flex-wrap:wrap; }
 .spot-station { flex:1 1 0;max-width:400px;min-width:0;background:rgba(255,255,255,0.05);backdrop-filter:blur(8px);border-radius:16px;padding:16px 20px;border:2.5px solid rgba(255,255,255,.08);transition:all .3s;position:relative;overflow:hidden;min-height:100px; }
 .spot-station::before { content:'';position:absolute;top:0;left:0;right:0;height:5px;border-radius:16px 16px 0 0; }
 .spot-station.spot-active { border-color:var(--golden);box-shadow:0 0 25px rgba(247,201,72,.3); }
 .spot-station.spot-active::before { background:var(--golden); }
 .spot-station.spot-next { border-color:var(--teal);box-shadow:0 0 15px rgba(78,205,196,.15); }
 .spot-station.spot-next::before { background:var(--teal); }
+.spot-station.spot-zero { border-color:var(--green); }
 .spot-label { font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:4px; }
 .spot-label.label-active { color:var(--golden); }
 .spot-label.label-next { color:var(--teal); }
@@ -748,21 +749,20 @@ function renderScoreboard() {
 
 function renderSpotlight() {
   const row = document.getElementById('spotlight-row');
-  const p = currentPlayer();
-  const np = nextPlayer();
-  row.innerHTML = `
-    <div class="spot-station spot-active" id="spot-current" style="--pc:${p.color}">
-      <div class="spot-label label-active">${t('currentChef')}</div>
+  row.innerHTML = G.players.map((p, i) => {
+    const isActive = i === G.currentIndex;
+    const isNext = i === nextPlayerIndex();
+    let cls = 'spot-station';
+    if (isActive) cls += ' spot-active';
+    else if (isNext) cls += ' spot-next';
+    if (p.orders <= 0) cls += ' spot-zero';
+    const label = isActive ? t('currentChef') : isNext ? t('nextChef') : '';
+    return `<div class="${cls}" id="spot-${i}" style="--pc:${p.color};${isActive ? '' : 'opacity:' + (isNext ? '0.7' : '0.4') + ';'}">
+      ${label ? '<div class="spot-label ' + (isActive ? 'label-active' : 'label-next') + '">' + label + '</div>' : ''}
       <div class="spot-name"><span style="font-size:1.5rem">${p.avatar}</span> ${p.name}</div>
-      <div class="spot-count" id="spot-count-current">${p.orders} <small>${t('orders')}</small></div>
-    </div>
-    <div class="spot-vs">⚡</div>
-    <div class="spot-station spot-next" id="spot-next" style="--pc:${np.color}">
-      <div class="spot-label label-next">${t('nextChef')}</div>
-      <div class="spot-name"><span style="font-size:1.5rem">${np.avatar}</span> ${np.name}</div>
-      <div class="spot-count" id="spot-count-next">${np.orders} <small>${t('orders')}</small></div>
-    </div>
-  `;
+      <div class="spot-count" id="spot-count-${i}">${p.orders} <small>${t('orders')}</small></div>
+    </div>`;
+  }).join('');
 }
 
 // ==================== CARD GENERATION ====================
@@ -965,17 +965,17 @@ function stopFlipping() {
       G.stats.totalServed += readyCount;
 
       // Animate current player count
-      const spotCount = document.getElementById('spot-count-current');
+      const spotCount = document.getElementById('spot-count-' + G.currentIndex);
       if (spotCount) {
         spotCount.innerHTML = `${p.orders} <small>${t('orders')}</small>`;
         spotCount.classList.add('count-shrink');
         setTimeout(() => spotCount.classList.remove('count-shrink'), 400);
       }
-      const spotEl = document.getElementById('spot-current');
+      const spotEl = document.getElementById('spot-' + G.currentIndex);
       if (spotEl) { spotEl.classList.add('blink-green'); setTimeout(() => spotEl.classList.remove('blink-green'), 400); }
 
       // Float number
-      floatNumber(document.getElementById('spot-current'), `-${readyCount}`, 'var(--green)');
+      floatNumber(document.getElementById('spot-' + G.currentIndex), `-${readyCount}`, 'var(--green)');
 
       setNarrator(t('served', { n: readyCount }), 'status-ready');
       SFX.ready();
@@ -995,16 +995,17 @@ function stopFlipping() {
       np.orders += dumpCount;
       G.stats.totalDumped += dumpCount;
 
-      const spotCountNext = document.getElementById('spot-count-next');
+      const nIdx = nextPlayerIndex();
+      const spotCountNext = document.getElementById('spot-count-' + nIdx);
       if (spotCountNext) {
         spotCountNext.innerHTML = `${np.orders} <small>${t('orders')}</small>`;
         spotCountNext.classList.add('count-punch');
         setTimeout(() => spotCountNext.classList.remove('count-punch'), 400);
       }
-      const spotNextEl = document.getElementById('spot-next');
+      const spotNextEl = document.getElementById('spot-' + nIdx);
       if (spotNextEl) { spotNextEl.classList.add('blink-purple'); setTimeout(() => spotNextEl.classList.remove('blink-purple'), 400); }
 
-      floatNumber(document.getElementById('spot-next'), `+${dumpCount}`, 'var(--purple)');
+      floatNumber(document.getElementById('spot-' + nIdx), `+${dumpCount}`, 'var(--purple)');
 
       setNarrator(t('dumped', { n: dumpCount, next: np.name }), 'status-dump');
       SFX.dump();
