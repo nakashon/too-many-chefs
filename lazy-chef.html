@@ -149,6 +149,8 @@ html[dir="rtl"] .player-row { border-left:none;border-right:4px solid var(--oran
 @keyframes cardFlyRight { 0% { transform: translateX(0) scale(1); opacity: 1; } 100% { transform: translateX(200px) scale(0.6); opacity: 0; } }
 .card-container.card-fly-back { animation: cardFlyBack 0.5s ease-in forwards; }
 @keyframes cardFlyBack { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.7) translateY(20px); opacity: 0; } }
+.card-container.card-deal { animation: cardDeal 0.3s ease-out forwards; }
+@keyframes cardDeal { 0% { transform: scale(0.3) translateY(-40px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 .card-container.card-shake { animation: cardShake 0.5s ease-in-out; }
 @keyframes cardShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
 
@@ -717,7 +719,8 @@ function startTurn() {
   startFlipPhase();
 
   if (p.isAI) {
-    setTimeout(() => aiTurn(), 800);
+    const dealTime = p.orders * 80 + 500;
+    setTimeout(() => aiTurn(), dealTime);
   }
 }
 
@@ -791,7 +794,35 @@ function startFlipPhase() {
   hideBtn('btn-stop');
   document.getElementById('flip-summary').innerHTML = '';
 
-  if (!p.isAI) enableCardTaps();
+  // Animate cards dealing out + count dropping to 0
+  const containers = document.querySelectorAll('.card-container');
+  containers.forEach((c, i) => {
+    c.style.opacity = '0';
+    setTimeout(() => {
+      c.style.opacity = '';
+      c.classList.add('card-deal');
+    }, i * 80);
+  });
+
+  const spotCount = document.getElementById('spot-count-' + G.currentIndex);
+  const dealTime = count * 80 + 300;
+  if (spotCount) {
+    let displayed = count;
+    const step = Math.max(1, Math.floor(count / Math.min(count, 6)));
+    const interval = setInterval(() => {
+      displayed = Math.max(0, displayed - step);
+      spotCount.innerHTML = `${displayed} <small>${t('orders')}</small>`;
+      if (displayed <= 0) clearInterval(interval);
+    }, 80);
+    spotCount.classList.add('count-shrink');
+    setTimeout(() => spotCount.classList.remove('count-shrink'), 400);
+    floatNumber(document.getElementById('spot-' + G.currentIndex), `-${count}`, 'var(--orange)');
+  }
+
+  // Enable taps after deal animation
+  setTimeout(() => {
+    if (!p.isAI) enableCardTaps();
+  }, dealTime);
 }
 
 function renderCards() {
@@ -909,6 +940,9 @@ function handleBust() {
   disableAllCards();
   hideBtn('btn-stop');
 
+  const p = currentPlayer();
+  const totalCards = G.luck.results.length;
+
   // Show bust overlay
   const kitchen = document.getElementById('kitchen-area');
   const overlay = document.createElement('div');
@@ -923,13 +957,22 @@ function handleBust() {
 
   setNarrator(t('burnt'), 'status-burnt');
 
-  // After shake, fly all flipped cards back to chef
+  // After shake, fly ALL cards back to chef (flipped + unflipped)
   setTimeout(() => {
     overlay.remove();
-    document.querySelectorAll('.card-inner.flipped').forEach(el => {
-      el.parentElement.classList.remove('card-shake');
-      el.parentElement.classList.add('card-fly-back');
+    document.querySelectorAll('.card-container').forEach(el => {
+      el.classList.remove('card-shake');
+      el.classList.add('card-fly-back');
     });
+
+    // Restore count back up with float
+    const spotCount = document.getElementById('spot-count-' + G.currentIndex);
+    if (spotCount) {
+      spotCount.innerHTML = `${p.orders} <small>${t('orders')}</small>`;
+      spotCount.classList.add('count-punch');
+      setTimeout(() => spotCount.classList.remove('count-punch'), 400);
+    }
+    floatNumber(document.getElementById('spot-' + G.currentIndex), `+${totalCards}`, 'var(--red)');
   }, 1400);
 
   // Auto-advance after cards fly back
@@ -953,11 +996,13 @@ function stopFlipping() {
   const readyCount = countFlippedType(CARD.READY);
   const dumpCount = countFlippedType(CARD.DUMP);
   const cookingCount = countFlippedType(CARD.COOKING);
+  const unflippedCount = G.luck.flipped.filter(f => !f).length;
+  const returningCount = cookingCount + unflippedCount;
 
   // Animate resolution
   let delay = 0;
 
-  // Ready cards fly up
+  // Ready cards fly up (served — gone for good)
   if (readyCount > 0) {
     setTimeout(() => {
       for (let i = 0; i < G.luck.results.length; i++) {
@@ -969,26 +1014,13 @@ function stopFlipping() {
       p.orders -= readyCount;
       G.stats.totalServed += readyCount;
 
-      // Animate current player count
-      const spotCount = document.getElementById('spot-count-' + G.currentIndex);
-      if (spotCount) {
-        spotCount.innerHTML = `${p.orders} <small>${t('orders')}</small>`;
-        spotCount.classList.add('count-shrink');
-        setTimeout(() => spotCount.classList.remove('count-shrink'), 400);
-      }
-      const spotEl = document.getElementById('spot-' + G.currentIndex);
-      if (spotEl) { spotEl.classList.add('blink-green'); setTimeout(() => spotEl.classList.remove('blink-green'), 400); }
-
-      // Float number
-      floatNumber(document.getElementById('spot-' + G.currentIndex), `-${readyCount}`, 'var(--green)');
-
       setNarrator(t('served', { n: readyCount }), 'status-ready');
       SFX.ready();
     }, delay);
     delay += 900;
   }
 
-  // Dump cards fly right
+  // Dump cards fly right (to next player)
   if (dumpCount > 0) {
     setTimeout(() => {
       for (let i = 0; i < G.luck.results.length; i++) {
@@ -997,6 +1029,7 @@ function stopFlipping() {
           if (card) card.classList.add('card-fly-right');
         }
       }
+      p.orders -= dumpCount;
       np.orders += dumpCount;
       G.stats.totalDumped += dumpCount;
 
@@ -1018,17 +1051,34 @@ function stopFlipping() {
     delay += 900;
   }
 
-  // Cooking cards settle
-  if (cookingCount > 0) {
+  // Cooking + unflipped cards fly back to player's hand
+  if (returningCount > 0) {
     setTimeout(() => {
       for (let i = 0; i < G.luck.results.length; i++) {
         if (G.luck.flipped[i] && G.luck.results[i] === CARD.COOKING) {
           const card = document.querySelector(`.card-container[data-index="${i}"]`);
           if (card) card.classList.add('card-fly-back');
         }
+        if (!G.luck.flipped[i]) {
+          const card = document.querySelector(`.card-container[data-index="${i}"]`);
+          if (card) card.classList.add('card-fly-back');
+        }
       }
+
+      // Update current player count back up
+      const spotCount = document.getElementById('spot-count-' + G.currentIndex);
+      if (spotCount) {
+        spotCount.innerHTML = `${p.orders} <small>${t('orders')}</small>`;
+        spotCount.classList.add('count-punch');
+        setTimeout(() => spotCount.classList.remove('count-punch'), 400);
+      }
+      const spotEl = document.getElementById('spot-' + G.currentIndex);
+      if (spotEl) { spotEl.classList.add('blink-green'); setTimeout(() => spotEl.classList.remove('blink-green'), 400); }
+
+      floatNumber(document.getElementById('spot-' + G.currentIndex), `+${returningCount}`, 'var(--teal)');
+
       if (readyCount === 0 && dumpCount === 0) {
-        setNarrator(t('stillCooking', { n: cookingCount }), 'status-cooking');
+        setNarrator(t('stillCooking', { n: returningCount }), 'status-cooking');
       }
     }, delay);
     delay += 600;
@@ -1039,7 +1089,7 @@ function stopFlipping() {
     const msgs = [];
     if (readyCount > 0) msgs.push(t('resolveReady', { n: readyCount }));
     if (dumpCount > 0) msgs.push(t('resolveDump', { n: dumpCount, next: np.name }));
-    if (cookingCount > 0) msgs.push(t('resolveCooking', { n: cookingCount }));
+    if (returningCount > 0) msgs.push(t('resolveCooking', { n: returningCount }));
     if (msgs.length > 1) setNarrator(msgs.join(' · '), '');
 
     renderScoreboard();
