@@ -832,6 +832,34 @@ html, body {
   .mem-story-card p { font-size: 12px; line-height: 1.45; }
   .mem-closing { font-size: 13px; padding: 14px 18px; margin: 16px 0; }
   .mem-body .btn-primary { font-size: 15px; padding: 11px 36px; margin-top: 8px; }
+  /* Game-over panel — two-column layout in landscape */
+  .go-panel {
+    display: grid;
+    grid-template-columns: 88px 1fr;
+    grid-template-rows: auto auto auto auto;
+    column-gap: 20px;
+    row-gap: 2px;
+    padding: 16px 24px;
+    max-width: 500px;
+    align-items: center;
+  }
+  .go-photo-ring {
+    grid-column: 1;
+    grid-row: 1 / 5;
+    width: 88px;
+    height: 88px;
+    align-self: center;
+    margin-bottom: 0;
+  }
+  .go-title       { grid-column: 2; grid-row: 1; font-size: 26px; margin-top: 0; }
+  .go-score-wrap  { grid-column: 2; grid-row: 2; }
+  .go-score       { font-size: 32px; }
+  .go-score-label { font-size: 9px; }
+  .go-best        { grid-column: 2; grid-row: 3; font-size: 12px; }
+  .go-buttons     { grid-column: 2; grid-row: 4; flex-direction: row; gap: 8px; margin-top: 6px; }
+  .go-buttons .btn-primary,
+  .go-buttons .btn-secondary { width: auto; flex: 1; padding: 9px 12px; font-size: 13px; }
+
 }
 
 </style>
