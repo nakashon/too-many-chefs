@@ -802,6 +802,38 @@ html, body {
   direction: rtl;
 }
 
+
+/* ── Landscape mobile compact layout (short viewport) ── */
+@media (max-height: 520px) and (pointer: coarse) {
+
+  /* Menu screen */
+  .menu-content { padding: 0 20px 12px; }
+  .menu-subtitle-top { font-size: 12px; letter-spacing: 4px; margin-bottom: 0; }
+  .menu-title { font-size: 38px; line-height: 1; margin-bottom: 6px; }
+  .menu-tagline { font-size: 12px; margin-bottom: 2px; }
+  .menu-years { font-size: 11px; margin-bottom: 16px; }
+  .menu-buttons { gap: 8px; }
+  .btn-primary { font-size: 15px; padding: 11px 36px; }
+  .btn-secondary { font-size: 14px; padding: 9px 28px; }
+  .btn-link { font-size: 13px; padding: 6px 0; }
+  .menu-controls-hint { font-size: 10px; margin-top: 8px; padding: 5px 10px; }
+
+  /* Memorial screen — shrink header, tighten body */
+  .mem-header { height: 160px; }
+  .mem-header-content { padding-bottom: 12px; }
+  .mem-subtitle { font-size: 11px; letter-spacing: 2px; margin-bottom: 2px; }
+  .mem-title { font-size: 36px; }
+  .mem-years { font-size: 12px; margin-top: 2px; }
+  .mem-tagline { font-size: 11px; margin-top: 4px; }
+  .mem-body { padding: 20px 16px 40px; }
+  .mem-photo-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
+  .mem-story-card { padding: 12px 14px; }
+  .mem-story-card h3 { font-size: 13px; margin-bottom: 4px; }
+  .mem-story-card p { font-size: 12px; line-height: 1.45; }
+  .mem-closing { font-size: 13px; padding: 14px 18px; margin: 16px 0; }
+  .mem-body .btn-primary { font-size: 15px; padding: 11px 36px; margin-top: 8px; }
+}
+
 </style>
 </head>
 <body>
@@ -1757,13 +1789,21 @@ class GameScene extends Phaser.Scene {
       if (btn) { btn.textContent = state.muted ? '🔇' : '🔊'; btn.classList.toggle('muted', state.muted); }
     });
 
-    // Start on first interaction
+    // Start on first interaction — unlock BOTH audio elements in the same gesture
+    // (mobile browsers require each <audio> to be play()d within a user gesture)
+    let _audioUnlocked = false;
     const startMusic = () => {
+      if (_audioUnlocked) return;
+      _audioUnlocked = true;
+      // Pre-unlock godmode by playing then immediately pausing it
+      godmode.play().then(() => {
+        if (state.active !== 'godmode') { godmode.pause(); godmode.currentTime = 0; }
+      }).catch(() => {});
       if (state.active === 'normal') normal.play().catch(() => {});
-      else godmode.play().catch(() => {});
     };
-    document.addEventListener('keydown', startMusic, { once: true });
-    document.addEventListener('click',   startMusic, { once: true });
+    document.addEventListener('keydown',    startMusic, { once: true });
+    document.addEventListener('click',      startMusic, { once: true });
+    document.addEventListener('touchstart', startMusic, { once: true });
   }
 }
 
