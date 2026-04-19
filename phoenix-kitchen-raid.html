@@ -1217,7 +1217,11 @@ class BootScene extends Phaser.Scene {
       if (bar) bar.style.width = Math.min(98, Math.round((loaded / total) * 100)) + '%';
     });
 
+    // doFinish: guarded so it can only run once even if called multiple times
+    let _finished = false;
     const doFinish = () => {
+      if (_finished) return;
+      _finished = true;
       if (bar) bar.style.width = '100%';
       setTimeout(() => {
         const ls = document.getElementById('loading-screen');
@@ -1226,12 +1230,16 @@ class BootScene extends Phaser.Scene {
       }, 200);
     };
 
+    // Use window.setTimeout (not this.time.delayedCall) so the check keeps
+    // firing even when the tab is backgrounded and Phaser's rAF loop freezes
     const check = (attempts) => {
       const allReady = GAME_KEYS.every(k => this.textures.exists(k));
-      if (allReady || attempts > 80) { doFinish(); }
-      else { this.time.delayedCall(50, () => check(attempts + 1)); }
+      if (allReady || attempts > 120) { doFinish(); }
+      else { window.setTimeout(() => check(attempts + 1), 50); }
     };
-    this.time.delayedCall(100, () => check(0));
+    window.setTimeout(() => check(0), 300);
+    // Hard fallback: force past loading screen after 10s no matter what
+    window.setTimeout(doFinish, 10000);
   }
 }
 
