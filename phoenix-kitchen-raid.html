@@ -1477,13 +1477,30 @@ class GameScene extends Phaser.Scene {
       item.body.setSize(bw, bh);
       item.body.setOffset((item.width - bw / fitScale) / 2, item.height - bh / fitScale);
 
-      // Lane danger flash — red strip on the blocked lane
-      const laneY   = this.LANES[cfg.lane];
-      const laneTop = cfg.lane === 0 ? 190 : cfg.lane === 1 ? 308 : 415;
-      const laneH   = laneY - laneTop;
-      const danger  = this.add.rectangle(W + 60, laneY, 56, laneH, 0xFF2222, 0.28)
+      // ── Obstacle visuals — red tint, glow, warning icon, danger strip ──
+      item.setTint(0xFF8888);       // red tint: visually distinct from food
+      item._lane = cfg.lane;        // store for proximity sound check
+
+      const laneY     = this.LANES[cfg.lane];
+      const laneTop   = cfg.lane === 0 ? 190 : cfg.lane === 1 ? 308 : 415;
+      const laneH     = laneY - laneTop;
+      const dangerW   = item.displayWidth + 28;
+
+      // Red glow circle behind sprite, pulsing
+      const spriteCY  = laneY - item.displayHeight * 0.5;
+      const glowR     = Math.max(item.displayWidth, item.displayHeight) * 0.58;
+      const glow      = this.add.circle(W + 60, spriteCY, glowR, 0xFF1111, 0.25).setDepth(3);
+      this.tweens.add({ targets: glow, alpha: { from: 0.25, to: 0.07 }, duration: 280, yoyo: true, repeat: -1 });
+      item._glow = glow;
+
+      // ⚠️ warning label floating above obstacle
+      const warnTxt = this.add.text(W + 60, laneY - item.displayHeight - 2, '⚠️',
+        { fontSize: '15px', fontFamily: 'sans-serif' }).setOrigin(0.5, 1).setDepth(5);
+      item._warn = warnTxt;
+
+      // Danger lane strip — full width of obstacle
+      const danger = this.add.rectangle(W + 60, laneY, dangerW, laneH, 0xFF2222, 0.32)
         .setOrigin(0.5, 1).setDepth(3);
-      // Move danger marker with obstacle
       item._danger = danger;
 
       if (cfg.key === 'obs_broom') {
@@ -1529,7 +1546,25 @@ class GameScene extends Phaser.Scene {
 
   onHitObstacle(phoenix, obstacle) {
     if (this.invincible || this.bfActive || !this.gameActive) return;
-    if (obstacle._danger) obstacle._danger.destroy();
+    if (obstacle._danger) { obstacle._danger.destroy(); obstacle._danger = null; }
+    if (obstacle._glow)   { obstacle._glow.destroy();   obstacle._glow   = null; }
+    if (obstacle._warn)   { obstacle._warn.destroy();   obstacle._warn   = null; }
+
+    // Crash sound
+    if (window.pkSfx) window.pkSfx('hit');
+
+    // Red burst at collision point
+    const hitX = obstacle.x, hitY = this.LANES[this.lane];
+    for (let i = 0; i < 8; i++) {
+      const ang = (i / 8) * Math.PI * 2;
+      const r   = this.add.circle(hitX, hitY, 5, 0xFF2222, 0.9).setDepth(20);
+      this.tweens.add({ targets: r,
+        x: hitX + Math.cos(ang) * 55, y: hitY + Math.sin(ang) * 45,
+        alpha: 0, scale: 0, duration: 380,
+        onComplete: () => r.destroy()
+      });
+    }
+
     obstacle.destroy();
 
     this.lives--;
@@ -1640,8 +1675,12 @@ class GameScene extends Phaser.Scene {
     if (this.bfAura) { this.bfAura.destroy(); this.bfAura = null; }
     if (this.bfActive && window._pkAudio) window._pkAudio.setTempo(140);
     this.bfActive = false;
-    // Clean up any lingering danger markers
-    this.obstacles.getChildren().forEach(o => { if (o._danger) { o._danger.destroy(); o._danger = null; } });
+    // Clean up obstacle extras
+    this.obstacles.getChildren().forEach(o => {
+      if (o._danger) { o._danger.destroy(); o._danger = null; }
+      if (o._glow)   { o._glow.destroy();   o._glow   = null; }
+      if (o._warn)   { o._warn.destroy();   o._warn   = null; }
+    });
     this.cameras.main.shake(400, 0.02);
     this.time.delayedCall(900, () => {
       window.showGameOver(Math.floor(this.score));
@@ -1691,10 +1730,22 @@ class GameScene extends Phaser.Scene {
     this.obstacles.getChildren().slice()
       .forEach(item => {
         if (item.x < -120) {
-          if (item._danger) item._danger.destroy();
+          if (item._danger) { item._danger.destroy(); item._danger = null; }
+          if (item._glow)   { item._glow.destroy();   item._glow   = null; }
+          if (item._warn)   { item._warn.destroy();   item._warn   = null; }
           item.destroy();
-        } else if (item._danger) {
-          item._danger.setX(item.x);  // keep danger marker in sync
+        } else {
+          if (item._danger) item._danger.setX(item.x);
+          if (item._glow)   {
+            item._glow.setX(item.x);
+            item._glow.setY(item.y - item.displayHeight * 0.5);
+          }
+          if (item._warn)   item._warn.setX(item.x);
+          // Proximity warning beep — once per obstacle when it gets close
+          if (!item._warnPlayed && item.x < 520 && item.x > 80 && !this.invincible) {
+            item._warnPlayed = true;
+            if (window.pkSfx) window.pkSfx('warn');
+          }
         }
       });
 
@@ -1858,6 +1909,40 @@ class GameScene extends Phaser.Scene {
     document.addEventListener('touchstart', startMusic, { once: true });
   }
 }
+
+
+// ── Obstacle sound effects (Web Audio API) ──
+window.pkSfx = function(type) {
+  try {
+    if (!window._pkSfxCtx)
+      window._pkSfxCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = window._pkSfxCtx;
+    if (ctx.state === 'suspended') ctx.resume();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    if (type === 'warn') {
+      o.type = 'sawtooth'; o.frequency.value = 170;
+      g.gain.setValueAtTime(0.06, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.13);
+      o.start(); o.stop(ctx.currentTime + 0.13);
+    } else if (type === 'hit') {
+      o.type = 'sawtooth'; o.frequency.value = 95;
+      g.gain.setValueAtTime(0.14, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      o.start(); o.stop(ctx.currentTime + 0.5);
+      // Low thud follow-up
+      setTimeout(() => { try {
+        const ctx2 = window._pkSfxCtx;
+        const o2 = ctx2.createOscillator(), g2 = ctx2.createGain();
+        o2.connect(g2); g2.connect(ctx2.destination);
+        o2.type = 'sawtooth'; o2.frequency.value = 55;
+        g2.gain.setValueAtTime(0.09, ctx2.currentTime);
+        g2.gain.exponentialRampToValueAtTime(0.001, ctx2.currentTime + 0.38);
+        o2.start(); o2.stop(ctx2.currentTime + 0.38);
+      } catch(e) {} }, 90);
+    }
+  } catch(e) {}
+};
 
 // ═══════════════════════════════════════════════════════════════
 // PHASER INIT
