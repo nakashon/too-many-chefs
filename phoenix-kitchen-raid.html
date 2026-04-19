@@ -1907,6 +1907,20 @@ class GameScene extends Phaser.Scene {
     document.addEventListener('keydown',    startMusic, { once: true });
     document.addEventListener('click',      startMusic, { once: true });
     document.addEventListener('touchstart', startMusic, { once: true });
+
+    // Pause music when tab is hidden (prevents double-audio across tabs)
+    document.addEventListener('visibilitychange', () => {
+      const a = window._pkAudio;
+      if (document.hidden) {
+        a.normal.pause();
+        a.godmode.pause();
+      } else {
+        // Resume only the active track when returning to tab
+          if (a.active === 'godmode') a.godmode.play().catch(() => {});
+          else a.normal.play().catch(() => {});
+        }
+      }
+    });
   }
 }
 
