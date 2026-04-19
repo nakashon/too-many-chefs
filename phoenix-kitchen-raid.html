@@ -933,8 +933,8 @@ html, body {
 
 <!-- Mobile tap controls — outside game-wrap to avoid Phaser canvas event capture -->
 <div id="mobile-controls" class="hidden">
-  <button id="btn-up"   class="mobile-btn"   aria-label="למעלה" ontouchstart="return false">▲</button>
-  <button id="btn-down" class="mobile-btn"   aria-label="למטה"  ontouchstart="return false">▼</button>
+  <button id="btn-up"   class="mobile-btn"   aria-label="למעלה">▲</button>
+  <button id="btn-down" class="mobile-btn"   aria-label="למטה">▼</button>
 </div>
 
 <!-- Loading screen -->
@@ -1365,6 +1365,7 @@ class GameScene extends Phaser.Scene {
     this.comboTimer   = 0;
     this.speed        = 280;
     this.gameActive   = true;
+    window._pkSwitchLane = (dir) => this.switchLane(dir);  // direct ref for mobile buttons
     this.invincible   = false;
     this.invincibleTimer = 0;
     this.bfActive     = false;
@@ -2095,18 +2096,20 @@ document.getElementById('btn-mem-back').addEventListener('click', () => {
     if (ctrl) ctrl.classList.remove('hidden');
     const btnUp   = document.getElementById('btn-up');
     const btnDown = document.getElementById('btn-down');
-    function getScene() {
-      return window.game && window.game.scene && window.game.scene.scenes.find(s => s.sys.isActive());
-    }
     function handleBtn(dir) {
-      const sc = getScene();
+      // Use global ref exposed by GameScene, or fall back to scene lookup
+      if (window._pkSwitchLane) { window._pkSwitchLane(dir); return; }
+      const sc = window.game && window.game.scene && window.game.scene.getScene('Game');
       if (sc && sc.switchLane) sc.switchLane(dir);
     }
+    function onBtn(e, dir) { e.stopPropagation(); e.preventDefault(); handleBtn(dir); }
     if (btnUp) {
-      btnUp.addEventListener('touchstart', e => { e.stopPropagation(); e.preventDefault(); handleBtn(-1); }, { passive: false });
+      btnUp.addEventListener('touchstart', e => onBtn(e, -1), { passive: false });
+      btnUp.addEventListener('touchend',   e => onBtn(e, -1), { passive: false });
     }
     if (btnDown) {
-      btnDown.addEventListener('touchstart', e => { e.stopPropagation(); e.preventDefault(); handleBtn(1); }, { passive: false });
+      btnDown.addEventListener('touchstart', e => onBtn(e,  1), { passive: false });
+      btnDown.addEventListener('touchend',   e => onBtn(e,  1), { passive: false });
     }
   }
   document.addEventListener('DOMContentLoaded', wireButtons);
