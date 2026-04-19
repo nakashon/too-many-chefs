@@ -922,7 +922,7 @@ html, body {
   </div>
   <div class="hud-right">
     <div class="hud-lives" id="hud-lives">🦴🦴🦴</div>
-    <div class="hud-bf" id="hud-bf">🐾 10 ברצף → מצב אלוהי</div>
+    <div class="hud-bf" id="hud-bf">🐾 10 ברצף → אכול כפי יכולתך</div>
   </div>
 </div>
 
@@ -962,7 +962,7 @@ html, body {
       <a id="btn-memorial" class="btn-link" href="#">♥ על פניקס</a>
     </div>
   </div>
-  <div class="menu-controls-hint">↑↓ להחליף נתיב &nbsp;•&nbsp; לאסוף אוכל &nbsp;•&nbsp; להתחמק ממכשולים &nbsp;•&nbsp; 10 ברצף → ✨ מצב אלוהי</div>
+  <div class="menu-controls-hint">↑↓ להחליף נתיב &nbsp;•&nbsp; לאסוף אוכל &nbsp;•&nbsp; להתחמק ממכשולים &nbsp;•&nbsp; 10 ברצף → ✨ אכול כפי יכולתך</div>
 </div>
 
 <!-- Game Over screen -->
@@ -1016,7 +1016,7 @@ html, body {
       <div class="tut-items">👟 🧹 🎒</div>
     </div>
   </div>
-  <div class="tut-power">✨ אכלי <b>10 מזונות ברצף</b> ללא החמצה → <b>מצב אלוהי</b> מופעל אוטומטית!</div>
+  <div class="tut-power">✨ אכלי <b>10 מזונות ברצף</b> ללא החמצה → <b>אכול כפי יכולתך</b> מופעל אוטומטית!</div>
   <div class="tut-hint">↑ ↓ להחליף נתיב &nbsp;·&nbsp; החמצת אוכל שוברת את הקומבו!</div>
 </div>
 
@@ -1129,13 +1129,13 @@ window.updateHUD = function(state) {
 
   const bfEl = document.getElementById('hud-bf');
   if (state.bfActive) {
-    bfEl.textContent = '✨ מצב אלוהי ' + Math.ceil(state.bfTimer) + 'ש';
+    bfEl.textContent = '✨ אכול כפי יכולתך ' + Math.ceil(state.bfTimer) + 'ש';
     bfEl.className = 'hud-bf active';
   } else if (state.streak >= 7) {
-    bfEl.textContent = '🔥 ' + state.streak + '/10 ברצף — מצב אלוהי בקרוב!';
+    bfEl.textContent = '🔥 ' + state.streak + '/10 ברצף — אכול כפי יכולתך בקרוב!';
     bfEl.className = 'hud-bf active';
   } else {
-    bfEl.textContent = '🐾 10 ברצף → מצב אלוהי';
+    bfEl.textContent = '🐾 10 ברצף → אכול כפי יכולתך';
     bfEl.className = 'hud-bf';
   }
 };
@@ -1602,7 +1602,7 @@ class GameScene extends Phaser.Scene {
     if (window._pkAudio) window._pkAudio.setTempo(200);
 
     // Big flash announcement
-    const gm = this.add.text(this.W/2, this.H/2 - 40, '✨ מצב אלוהי! ✨', {
+    const gm = this.add.text(this.W/2, this.H/2 - 40, '✨ אכול כפי יכולתך! 🍕', {
       fontSize: '38px', fontFamily: 'Playfair Display, serif',
       color: '#FFD700', stroke: '#000', strokeThickness: 5,
     }).setDepth(22).setOrigin(0.5);
@@ -2097,14 +2097,14 @@ const STRINGS = {
     menuPresents:'פיניקס מציגה:',
     menuTitle:   'פשיטה על המטבח',
     menuTagline: 'מחווה לגנבת האוכל הגדולה בעולם 🐾',
-    menuHint:    '↑↓ להחליף נתיב\u00a0•\u00a0לאסוף אוכל\u00a0•\u00a0להתחמק ממכשולים\u00a0•\u00a010 ברצף → ✨ מצב אלוהי',
+    menuHint:    '↑↓ להחליף נתיב\u00a0•\u00a0לאסוף אוכל\u00a0•\u00a0להתחמק ממכשולים\u00a0•\u00a010 ברצף → ✨ אכול כפי יכולתך',
     btnPlay:     '🐾 שחק עכשיו',
     btnMemorial: '♥ על פניקס',
     hudScore:    'ניקוד',
     hudCombo:    'קומבו',
-    hudBfReady:  '🐾 10 ברצף → מצב אלוהי',
-    hudBfSoon:   n => `🔥 ${n}/10 ברצף — מצב אלוהי בקרוב!`,
-    hudBfActive: t => `✨ מצב אלוהי ${t}ש`,
+    hudBfReady:  '🐾 10 ברצף → אכול כפי יכולתך',
+    hudBfSoon:   n => `🔥 ${n}/10 ברצף — אכול כפי יכולתך בקרוב!`,
+    hudBfActive: t => `✨ אכול כפי יכולתך ${t}ש`,
     goTitle:     'נתפסת!',
     goScoreLabel:'ניקוד',
     goBest:      'שיא:',
@@ -2118,12 +2118,12 @@ const STRINGS = {
     tutTitle:    '🐾 פשיטה על המטבח של פניקס',
     tutEat:      '✅ תאכלי את אלה',
     tutDodge:    '❌ תתחמקי מאלה',
-    tutPower:    '✨ אכלי <b>10 מזונות ברצף</b> ללא החמצה → <b>מצב אלוהי</b> מופעל אוטומטית!',
+    tutPower:    '✨ אכלי <b>10 מזונות ברצף</b> ללא החמצה → <b>אכול כפי יכולתך</b> מופעל אוטומטית!',
     tutHint:     '↑ ↓ להחליף נתיב\u00a0·\u00a0החמצת אוכל שוברת את הקומבו!',
     zoneLow:     '▼ נמוך',
     zoneMid:     '● אמצע',
     zoneHigh:    '▲ גבוה',
-    godModeText: '✨ מצב אלוהי! ✨',
+    godModeText: '✨ אכול כפי יכולתך! 🍕',
     missText:    'החמצה!',
     stories: [
       { title:'🎂 הגאלט דה רווא', body:'פניקס אכלה עוגת מלוכה שלמה. שעות של דאגה — שמא בלעה גם את הפיגורינה הנסתרת בפנים. היא לא. את כל השאר — כן.' },
@@ -2154,14 +2154,14 @@ const STRINGS = {
     menuPresents:'Phoenix Presents:',
     menuTitle:   'Kitchen Raid',
     menuTagline: "A tribute to the world's greatest food thief 🐾",
-    menuHint:    '↑↓ to switch lanes\u00a0•\u00a0collect food\u00a0•\u00a0dodge obstacles\u00a0•\u00a010 in a row → ✨ God Mode',
+    menuHint:    '↑↓ to switch lanes\u00a0•\u00a0collect food\u00a0•\u00a0dodge obstacles\u00a0•\u00a010 in a row → ✨ All You Can Eat',
     btnPlay:     '🐾 Play Now',
     btnMemorial: '♥ About Phoenix',
     hudScore:    'Score',
     hudCombo:    'Combo',
-    hudBfReady:  '🐾 10 in a row → God Mode',
-    hudBfSoon:   n => `🔥 ${n}/10 streak — God Mode coming!`,
-    hudBfActive: t => `✨ God Mode ${t}s`,
+    hudBfReady:  '🐾 10 in a row → All You Can Eat',
+    hudBfSoon:   n => `🔥 ${n}/10 streak — All You Can Eat coming!`,
+    hudBfActive: t => `✨ All You Can Eat ${t}s`,
     goTitle:     'Caught!',
     goScoreLabel:'Score',
     goBest:      'Best:',
@@ -2175,12 +2175,12 @@ const STRINGS = {
     tutTitle:    "🐾 Phoenix's Kitchen Raid",
     tutEat:      '✅ Eat these',
     tutDodge:    '❌ Dodge these',
-    tutPower:    '✨ Eat <b>10 foods in a row</b> without missing → <b>God Mode</b> activates automatically!',
+    tutPower:    '✨ Eat <b>10 foods in a row</b> without missing → <b>All You Can Eat</b> activates automatically!',
     tutHint:     '↑ ↓ to switch lane\u00a0·\u00a0Missing food breaks your combo!',
     zoneLow:     '▼ Low',
     zoneMid:     '● Mid',
     zoneHigh:    '▲ High',
-    godModeText: '✨ God Mode! ✨',
+    godModeText: '✨ All You Can Eat! 🍕',
     missText:    'Miss!',
     stories: [
       { title:'🎂 The King Cake', body:"Phoenix ate an entire Galette des Rois. Hours of anxiety — had she swallowed the hidden figurine? She hadn't. Everything else — yes." },
